@@ -17,21 +17,21 @@ Here's a comparison of the functionalities between the `Julia` package and this 
 
 | Functionality                                | ProtocolDataUnits.jl (Julia) | ProtocolDataUnits (Python) |
 |----------------------------------------------|:----------------------------:|:--------------------------:|
-| Base PDU Definition                          |              ✔️              |             ✔️             |
-| PDU Encoding/Decoding                        |              ✔️              |             ✔️             |
-| Nested PDU Support                           |              ✔️              |             ❌             |
-| CRC32 Checksum                               |              ❌              |             ✔️             |
-| Field Encoding/Decoding                      |              ✔️              |             ✔️             |
-| Byte Order Conversion                        |              ✔️              |             ✔️             |
-| Bit-level Utility Functions                  |              ❌              |             ❌             |
-| Custom Exceptions                            |              ❌              |             ❌             |
-| Ethernet Frame (or other specific PDU types) |              ❌              |             ✔️             |
-| Metadata Storage                             |              ❌              |             ✔️             |
-| Stream Writing/Reading                       |              ✔️              |             ✔️             |
-| Variable Length Encoding/Decoding            |              ✔️              |             ✔️             |
-| Pretty Printing of PDUs                      |              ✔️              |             ❌             |
-| PDU Equality based on Fields                 |              ✔️              |             ✔️             |
-| Decoding with Specified Number of Bytes      |              ✔️              |             ❌             |
+| Base PDU Definition                          |              TBD              |             ✔️             |
+| PDU Encoding/Decoding                        |              TBD              |             ✔️             |
+| Nested PDU Support                           |              TBD              |             ❌             |
+| CRC32 Checksum                               |              TBD              |             ✔️             |
+| Field Encoding/Decoding                      |              TBD              |             ✔️             |
+| Byte Order Conversion                        |              TBD              |             ✔️             |
+| Bit-level Utility Functions                  |              TBD              |             ❌             |
+| Custom Exceptions                            |              TBD              |             ❌             |
+| Ethernet Frame (or other specific PDU types) |              TBD              |             ✔️             |
+| Metadata Storage                             |              TBD              |             ✔️             |
+| Stream Writing/Reading                       |              TBD              |             ✔️             |
+| Variable Length Encoding/Decoding            |              TBD              |             ✔️             |
+| Pretty Printing of PDUs                      |              TBD              |             ❌             |
+| PDU Equality based on Fields                 |              TBD              |             ✔️             |
+| Decoding with Specified Number of Bytes      |              TBD              |             ❌             |
 
 ### Functionality Table
 
