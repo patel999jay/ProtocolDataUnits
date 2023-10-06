@@ -6,7 +6,7 @@ ProtocolDataUnits is a Python toolset for encoding and decoding Protocol Data Un
 
 You can install ProtocolDataUnits using pip:
 ```
-pip install ProtocolDataUnits
+pip install . # pip install ProtocolDataUnits
 ```
 
 ## Features
@@ -15,32 +15,40 @@ Here's a comparison of the functionalities between the `Julia` package and this 
 
 ### Comparison Table
 
-| Functionality                                | Julia Package | Python Class |
-|----------------------------------------------|:-------------:|:------------:|
-| Base PDU Definition                          |       ✔️      |      ✔️      |
-| PDU Encoding/Decoding                        |       ✔️      |      ✔️      |
-| Nested PDU Support                           |       ✔️      |      ✔️      |
-| CRC32 Checksum                               |       ✔️      |      ✔️      |
-| Field Encoding/Decoding                      |       ✔️      |      ✔️      |
-| Byte Order Conversion                        |       ✔️      |      ❌      |
-| Bit-level Utility Functions                  |       ✔️      |      ❌      |
-| Custom Exceptions                            |       ✔️      |      ❌      |
-| Ethernet Frame (or other specific PDU types) |       ❌      |      ✔️      |
+| Functionality                                | ProtocolDataUnits.jl (Julia) | ProtocolDataUnits (Python) |
+|----------------------------------------------|:----------------------------:|:--------------------------:|
+| Base PDU Definition                          |              ✔️              |             ✔️             |
+| PDU Encoding/Decoding                        |              ✔️              |             ✔️             |
+| Nested PDU Support                           |              ✔️              |             ❌             |
+| CRC32 Checksum                               |              ❌              |             ✔️             |
+| Field Encoding/Decoding                      |              ✔️              |             ✔️             |
+| Byte Order Conversion                        |              ✔️              |             ✔️             |
+| Bit-level Utility Functions                  |              ❌              |             ❌             |
+| Custom Exceptions                            |              ❌              |             ❌             |
+| Ethernet Frame (or other specific PDU types) |              ❌              |             ✔️             |
+| Metadata Storage                             |              ❌              |             ✔️             |
+| Stream Writing/Reading                       |              ✔️              |             ✔️             |
+| Variable Length Encoding/Decoding            |              ✔️              |             ✔️             |
+| Pretty Printing of PDUs                      |              ✔️              |             ❌             |
+| PDU Equality based on Fields                 |              ✔️              |             ✔️             |
+| Decoding with Specified Number of Bytes      |              ✔️              |             ❌             |
 
 ### Functionality Table
 
-| Feature/Aspect                  | Julia Package                        | Python Package                        |
-|--------------------------------|--------------------------------------|--------------------------------------|
-| Language                       | Julia                                | Python                               |
-| CRC Computation                | Built-in CRC32 functionality         | Uses binascii.crc32                  |
-| Byte Order Configurability     | Yes (via hton and ntoh functions)    | Yes (via byte_order parameter)       |
-| Encoding                       | Uses built-in IOBuffer               | Uses bytearray and to_bytes          |
-| Decoding                       | Uses built-in IOBuffer               | Uses bytearray and from_bytes        |
-| Nested PDU                     | Supported (with recursion)           | Placeholder (no recursion)           |
-| Metadata Storage               | Not Present                          | Yes (via metadata dictionary)        |
-| Stream Writing/Reading         | Supported via write and read         | Supported via write_to_stream and read_from_stream |
-| Variable Length Field          | Supported                            | Supported                            |
-| CRC Verification               | Supported                            | Supported                            |
+| Feature/Aspect                  | ProtocolDataUnits.jl (Julia)     | PDU (Python)                         |
+|--------------------------------|----------------------------------|--------------------------------------|
+| Basic Functionality            |                                  |                                      |
+| Encoding PDUs                  | Yes                              | Yes                                  |
+| Decoding PDUs                  | Yes                              | Yes                                  |
+| CRC Support                    | Yes                              | Yes                                  |
+| PDU Specifics                  |                                  |                                      |
+| Ethernet Frame                 | Yes                              | Yes (via EthernetFrame class)        |
+| Nested PDUs                    | Not Explicitly Mentioned         | Designed but not implemented         |
+| Byte Order Flexibility         | Yes (BIG_ENDIAN, LITTLE_ENDIAN)  | Yes                                  |
+| Variable Length Payload        | Yes                              | Yes                                  |
+| Additional Features            |                                  |                                      |
+| Pretty Printing                | Yes                              | Via __repr__ method                  |
+| Metadata Support               | Through PDUInfo                  | Yes, via metadata attribute          |
 
 ## Usage
 
