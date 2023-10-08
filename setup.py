@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name="ProtocolDataUnits",
     version="1.0.0",
-    packages=find_packages(),
+    packages=find_packages(exclude=('tests', 'docs')),
     install_requires=[
         # Any dependencies project has, e.g.
         # 'requests',

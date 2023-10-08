@@ -27,6 +27,7 @@ class PDU:
         return crc
 
     def encode(self):
+        "Encoding function"
         encoded = bytearray()
         encoded.append(self.type)
         encoded.extend(self.duration.to_bytes(
@@ -41,6 +42,7 @@ class PDU:
 
     @classmethod
     def decode(cls, encoded, byte_order='>'):
+        "Decoding function"
         # Debug print: Full encoded data
         print(f"Full encoded data: {encoded.hex()}")
 
@@ -114,6 +116,7 @@ class PDU:
 
 
 class PDUInfo:
+    "PDUInfo"
     def __init__(self, length: int, metadata: dict):
         self.length = length
         self.metadata = metadata
@@ -123,7 +126,7 @@ class PDUInfo:
 
 
 class EthernetFrame(PDU):
-
+    "EthernetFrame class"
     def __init__(self, dstaddr, srcaddr, ethtype, payload):
         self.dstaddr = dstaddr  # tuple of 6 bytes
         self.srcaddr = srcaddr  # tuple of 6 bytes
