@@ -1,5 +1,7 @@
 # ProtocolDataUnits
 
+[![Documentation](https://readthedocs.org/projects/protocoldataunits/badge/?version=latest)](https://protocoldataunits.readthedocs.io/en/latest/?badge=latest)
+
 ProtocolDataUnits is a Python toolset for encoding and decoding Protocol Data Units (PDUs), It is inspired by the `ProtocolDataUnits.jl` by [Dr Mandar Chitre](https://github.com/mchitre), [ARL](https://github.com/org-arl).
 
 ## Installation
