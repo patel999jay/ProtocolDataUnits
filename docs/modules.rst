@@ -4,4 +4,4 @@ ProtocolDataUnits
 .. toctree::
    :maxdepth: 4
 
-   setup
+   ProtocolDataUnits
