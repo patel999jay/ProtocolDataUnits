@@ -8,22 +8,100 @@
 import struct
 import binascii
 import io
+import logging
+
+# Constants
+DEFAULT_BYTE_ORDER = '>'
+
+
+# Set up logging configuration
+logging.basicConfig(level=logging.INFO)
+
 
 class PDU:
-    def __init__(self, type, duration, payload=None, nested_pdu=None, byte_order='>', *args, **kwargs):
+    """
+    Represents a Protocol Data Unit (PDU).
+
+    A Protocol Data Unit (PDU) is a single unit of data in communication networks.
+    This class provides methods to encode and decode PDUs, compute CRC values,
+    and manage nested PDUs.
+
+    :type: int
+    :param type: The type of the PDU.
+
+    :duration: int
+    :param duration: The duration or lifetime of the PDU.
+
+    :payload: bytes
+    :param payload: The actual data carried by the PDU.
+
+    :nested_pdu: PDU
+    :param nested_pdu: An optional nested PDU object.
+
+    :byte_order: str
+    :param byte_order: The byte order for encoding/decoding operations.
+
+    :metadata: dict
+    :param metadata: Additional metadata or information about the PDU.
+    """
+
+    """
+    Represents a Protocol Data Unit (PDU).
+
+    Attributes:
+    - type (int): The type of the PDU.
+    - duration (int): The duration of the PDU.
+    - payload (bytes): The payload of the PDU.
+    - nested_pdu (PDU): A nested PDU object.
+    - byte_order (str): The byte order for encoding/decoding.
+    - metadata (dict): Additional metadata for the PDU.
+    """
+
+    def __init__(self, type, duration, payload=None, nested_pdu=None, byte_order=DEFAULT_BYTE_ORDER, *args, **kwargs):
+        """
+        Initializes a new instance of the PDU class.
+
+        :type: int
+        :param type: The type of the PDU.
+
+        :duration: int
+        :param duration: The duration of the PDU.
+
+        :payload: bytes, optional
+        :param payload: The payload of the PDU. Defaults to empty bytes.
+
+        :nested_pdu: PDU, optional
+        :param nested_pdu: A nested PDU object. Defaults to None.
+
+        :byte_order: str, optional
+        :param byte_order: The byte order for encoding/decoding. Defaults to '>'.
+
+        :return: None
+        """
+
         self.type = type
         self.duration = duration
         self.payload = payload or b''
         self.nested_pdu = nested_pdu
         self.byte_order = byte_order
         self.metadata = {}  # Initialize the metadata attribute
-        print(
+        logging.info(
             f"Initialized PDU with type: {self.type}, duration: {self.duration}, payload: {self.payload}")
 
     @staticmethod
     def compute_crc(data):
+        """
+        Computes the CRC for the given data.
+
+        :data: bytes
+        :param data: The data for which the CRC needs to be computed.
+
+        :return: int
+        :rtype: The computed CRC value.
+        """
+
         crc = binascii.crc32(data) & 0xffffffff
-        print(f"Data: {data.hex()}, CRC: {crc}")
+        logging.info(f"Data: {data.hex()}, CRC: {crc}")
         return crc
 
     def encode(self):
@@ -33,18 +111,18 @@ class PDU:
         encoded.extend(self.duration.to_bytes(
             2, byteorder='big' if self.byte_order == '>' else 'little'))
         encoded.extend(self.encode_variable_length_field(self.payload))
-        print(f"Encoding Data for CRC: {encoded.hex()}")  # Debug print
+        logging.debug(f"Encoding Data for CRC: {encoded.hex()}")  # Debug print
         crc = self.compute_crc(encoded)
-        print(f"Encode CRC: {crc}")  # Debug print
+        logging.debug(f"Encode CRC: {crc}")  # Debug print
         encoded.extend(crc.to_bytes(4, byteorder='big' if self.byte_order ==
                        '>' else 'little'))  # Ensure 4 bytes for CRC
         return encoded
 
     @classmethod
-    def decode(cls, encoded, byte_order='>'):
+    def decode(cls, encoded, byte_order=DEFAULT_BYTE_ORDER):
         "Decoding function"
         # Debug print: Full encoded data
-        print(f"Full encoded data: {encoded.hex()}")
+        logging.debug(f"Full encoded data: {encoded.hex()}")
 
         type = encoded[0]
         duration = int.from_bytes(
@@ -65,14 +143,15 @@ class PDU:
         # Data for CRC calculation should be everything except the CRC itself
         data_for_crc = encoded[:offset-2]
         # Debug print
-        print(
+        logging.info(
             f"Data for CRC (length {len(data_for_crc)}): {data_for_crc.hex()}")
 
         computed_crc = cls.compute_crc(data_for_crc)
-        print(f"Decoded payload length: {len(payload)}")
-        print(f"Decoded payload: {payload.hex()}")
-        print(f"Offset after decoding variable-length field: {offset}")
-        print(f"Decode Computed CRC: {computed_crc}, Expected CRC: {crc}")
+        logging.debug(f"Decoded payload length: {len(payload)}")
+        logging.debug(f"Decoded payload: {payload.hex()}")
+        logging.debug(f"Offset after decoding variable-length field: {offset}")
+        logging.debug(
+            f"Decode Computed CRC: {computed_crc}, Expected CRC: {crc}")
         if computed_crc != crc:
             raise ValueError(
                 f"CRC mismatch: computed={computed_crc}, expected={crc}")
@@ -96,7 +175,7 @@ class PDU:
         stream.write(self.encode())
 
     @classmethod
-    def read_from_stream(cls, stream, byte_order='>'):
+    def read_from_stream(cls, stream, byte_order=DEFAULT_BYTE_ORDER):
         return cls.decode(stream.read(), byte_order)
 
     # Additional utility methods
@@ -117,6 +196,7 @@ class PDU:
 
 class PDUInfo:
     "PDUInfo"
+
     def __init__(self, length: int, metadata: dict):
         self.length = length
         self.metadata = metadata
@@ -127,12 +207,13 @@ class PDUInfo:
 
 class EthernetFrame(PDU):
     "EthernetFrame class"
+
     def __init__(self, dstaddr, srcaddr, ethtype, payload):
         self.dstaddr = dstaddr  # tuple of 6 bytes
         self.srcaddr = srcaddr  # tuple of 6 bytes
         self.ethtype = ethtype  # 2 bytes
         self.payload = payload  # variable length
-        print(f"Initialized payload: {self.payload}")  # Debug print
+        logging.info(f"Initialized payload: {self.payload}")  # Debug print
         # type and duration are dummy values
         super().__init__(type=0x00, duration=0, payload=payload)
 
@@ -145,11 +226,11 @@ class EthernetFrame(PDU):
         encoded.extend(self.srcaddr)
         encoded.extend(self.ethtype.to_bytes(2, byteorder='big'))
         encoded.extend(self.payload)
-        # print(f"Encoding before crc calculation - dstaddr: {self.dstaddr}, srcaddr: {self.srcaddr}, ethtype: {self.ethtype}, payload: {self.payload}")
+        # logging.info(f"Encoding before crc calculation - dstaddr: {self.dstaddr}, srcaddr: {self.srcaddr}, ethtype: {self.ethtype}, payload: {self.payload}")
         crc = self.compute_crc(encoded)
         encoded.extend(crc.to_bytes(4, byteorder='big'))
         # In encode method
-        print(
+        logging.info(
             f"Encoding - dstaddr: {self.dstaddr}, srcaddr: {self.srcaddr}, ethtype: {self.ethtype}, payload: {self.payload}, crc: {crc}")
         return encoded
 
@@ -162,7 +243,7 @@ class EthernetFrame(PDU):
         frame = cls(dstaddr, srcaddr, ethtype, payload)
         crc = int.from_bytes(encoded[-4:], byteorder='big')
         # In decode method
-        print(
+        logging.info(
             f"Decoding - dstaddr: {dstaddr}, srcaddr: {srcaddr}, ethtype: {ethtype}, payload: {payload}, crc: {crc}")
         if frame.compute_crc(encoded[:-4]) != crc:
             raise ValueError(

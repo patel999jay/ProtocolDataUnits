@@ -11,7 +11,7 @@ setup(
     author="Jay Patel",
     author_email="patel999jay@gmail.com",
     description="ProtocolDataUnits python tools, based on ProtocolDataUnits.jl",
-    long_description=open('README.md').read(),
+    long_description=open('README.md', encoding='utf-8').read(),
     long_description_content_type="text/markdown",
     url="https://github.com/patel999jay/ProtocolDataUnits",
     classifiers=[
