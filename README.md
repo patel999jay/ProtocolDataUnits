@@ -59,7 +59,11 @@ from ProtocolDataUnits.pdu import PDU, EthernetFrame
 
 # Create a PDU
 pdu = PDU(type=0x01, duration=500, payload=b'\x01\x02\x03\x04')
-encoded_pdu = pdu.encode()
+
+# Encode the PDU into bytes
+encoded_pdu = pdu.encode()  # Returns a byte representation of the PDU
+
+# Decode the bytes back into a PDU instance
 decoded_pdu = PDU.decode(encoded_pdu)
 
 # Create an Ethernet Frame
@@ -69,7 +73,11 @@ frame = EthernetFrame(
     ethtype=0x0800,
     payload=bytes([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08])
 )
-encoded_frame = frame.encode()
+
+# Encode the Ethernet Frame into bytes
+encoded_frame = frame.encode()  # Returns a byte representation of the Ethernet Frame
+
+# Decode the bytes back into an Ethernet Frame instance
 decoded_frame = EthernetFrame.decode(encoded_frame)
 ```
 
