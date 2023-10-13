@@ -1,8 +1,8 @@
 ProtocolDataUnits package
 =========================
 
-Submodules
-----------
+.. Submodules
+.. ----------
 
 ProtocolDataUnits.pdu module
 ----------------------------
