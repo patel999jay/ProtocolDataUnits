@@ -68,6 +68,10 @@ class PDU:
         self.pdu_length = None
         self.default_values = {}
 
+    def __repr__(self):
+        field_reprs = ", ".join(f"{name}={value}" for (field_type, name, value) in self.fields if name)
+        return f"PDU(length={self.pdu_length}, byte_order={'big' if self.byte_order == '>' else 'little'}, fields=[{field_reprs}])"    
+
     def length(self, length):
         self.pdu_length = length
         return self
