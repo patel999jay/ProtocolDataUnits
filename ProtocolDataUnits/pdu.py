@@ -304,7 +304,7 @@ class PDU:
         CRC Validation:
         - A CRC32 checksum is validated at the end of the decoded data to ensure data integrity.
         """
-        
+
         if decompress:
             data = zlib.decompress(data)
 
@@ -395,6 +395,28 @@ class PDU:
                     pdu = getattr(pdu, field_name)(*field_args)
         return pdu
 
+def create_pdu_format(length, byte_order, *fields):
+    """
+    Create a PDU format using a simplified and user-friendly API.
+
+    Parameters:
+    - length (int): The total length of the PDU.
+    - byte_order (str): The byte order to use ('big' for big-endian or 'little' for little-endian).
+    - *fields (tuples): A variable number of tuples, each representing a field in the PDU. 
+                        Each tuple should contain the field type followed by the necessary arguments.
+
+    Returns:
+    - PDU: An instance of the PDU class with the specified format.
+    """
+    pdu = PDU().length(length).order(byte_order)
+    for field in fields:
+        field_type = field[0]
+        if field_type == 'nested_pdu':
+            pdu = pdu.nested_pdu(field[1], field[2])
+        else:
+            pdu = getattr(pdu, field_type)(*field[1:])
+    return pdu
+
 if __name__ == "__main__":
     # Example for dynamic PDU format definition
     print("===========")
@@ -477,6 +499,45 @@ if __name__ == "__main__":
     print(f"Decoded Data (new PDU): {decoded_data_new}")
     print("===========")
 
+    print("===========")
+    print("API Example")
+    print("===========")
+
+    # Create a PDU format with various fields
+    my_pdu_format = create_pdu_format(
+        48, 'big',
+        ('uint8', 'type'),
+        ('float', 'value1'),
+        ('double', 'value2'),
+        ('fixed_string', 'fixed_str', 10),
+        ('length_prefixed_string', 'length_str'),
+        ('variable_length_array', 'array', 'uint8'),
+        ('padding', 0xff)
+    )
+
+    # Nested PDU example
+    nested_pdu = create_pdu_format(
+        8, 'big',
+        ('uint8', 'nested_type'),
+        ('uint8', 'nested_value')
+    )
+
+    main_pdu = create_pdu_format(
+        16, 'big',
+        ('uint8', 'type'),
+        ('nested_pdu', 'nested', nested_pdu)
+    )
+
+    # Encode data
+    encoded_bytes = main_pdu.encode({'type': 7, 'nested': {'nested_type': 1, 'nested_value': 2}})
+    print(f"Encoded Bytes: {encoded_bytes}")
+
+    # Decode data
+    decoded_data = main_pdu.decode(encoded_bytes)
+    print(f"Decoded Data: {decoded_data}")
+    print("===========")
+
+
     """
     ===========
     Basic Field Types Example
@@ -539,5 +600,15 @@ if __name__ == "__main__":
     ===========
     INFO:root:Data for CRC32: 074048f5c340191eb851eb851f68656c6c6f00000000000000000e64796e616d696320737472696e67000000050102030405ffffffffffffffffffffffffffff, CRC32: 1819767949
     Decoded Data (new PDU): {'type': 7, 'value1': 3.140000104904175, 'value2': 6.28, 'fixed_str': 'hello', 'length_str': 'dynamic string', 'array': [1, 2, 3, 4, 5]}
+    ===========
+    ===========
+    API Example
+    ===========
+    INFO:root:Data for CRC32: 0102, CRC32: 3066839698
+    INFO:root:Data for CRC32: 07000000060102b6cc4292, CRC32: 3960647709
+    Encoded Bytes: b'\x07\x00\x00\x00\x06\x01\x02\xb6\xccB\x92\xec\x12\xb0\x1d'
+    INFO:root:Data for CRC32: 0102, CRC32: 3066839698
+    INFO:root:Data for CRC32: 07000000060102b6cc4292, CRC32: 3960647709
+    Decoded Data: {'type': 7, 'nested': {'nested_type': 1, 'nested_value': 2}}
     ===========
     """
