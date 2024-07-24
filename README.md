@@ -2,7 +2,7 @@
 
 [![Documentation](https://readthedocs.org/projects/protocoldataunits/badge/?version=latest)](https://protocoldataunits.readthedocs.io/en/latest/?badge=latest)
 
-ProtocolDataUnits is a Python toolset for encoding and decoding Protocol Data Units (PDUs), It is inspired by the `ProtocolDataUnits.jl` by [Dr Mandar Chitre](https://github.com/mchitre), [ARL](https://github.com/org-arl).
+ProtocolDataUnits is a Python toolset for encoding and decoding Protocol Data Units (PDUs). It is inspired by `ProtocolDataUnits.jl` by [Dr. Mandar Chitre](https://github.com/mchitre), [ARL](https://github.com/org-arl).
 
 ## Installation
 
@@ -13,64 +13,99 @@ pip install . # pip install ProtocolDataUnits
 
 ## Features
 
-Here's a comparison of the functionalities between the `Julia` package and this `Python` package:
+`ProtocolDataUnits` is a Python toolset for encoding and decoding Protocol Data Units (PDUs). It includes the following features:
 
-### Comparison Table
-
-| Functionality                                | ProtocolDataUnits.jl (Julia) | ProtocolDataUnits (Python) |
-|----------------------------------------------|:----------------------------:|:--------------------------:|
-| Base PDU Definition                          |              TBD              |             ✔️             |
-| PDU Encoding/Decoding                        |              TBD              |             ✔️             |
-| Nested PDU Support                           |              TBD              |             ❌             |
-| CRC32 Checksum                               |              TBD              |             ✔️             |
-| Field Encoding/Decoding                      |              TBD              |             ✔️             |
-| Byte Order Conversion                        |              TBD              |             ✔️             |
-| Bit-level Utility Functions                  |              TBD              |             ❌             |
-| Custom Exceptions                            |              TBD              |             ❌             |
-| Ethernet Frame (or other specific PDU types) |              TBD              |             ✔️             |
-| Metadata Storage                             |              TBD              |             ✔️             |
-| Stream Writing/Reading                       |              TBD              |             ✔️             |
-| Variable Length Encoding/Decoding            |              TBD              |             ✔️             |
-| Pretty Printing of PDUs                      |              TBD              |             ❌             |
-| PDU Equality based on Fields                 |              TBD              |             ✔️             |
-| Decoding with Specified Number of Bytes      |              TBD              |             ❌             |
-
-### Functionality Table
-
-| Feature/Aspect                  | ProtocolDataUnits.jl (Julia)     | PDU (Python)                         |
-|--------------------------------|----------------------------------|--------------------------------------|
-| Basic Functionality            |                                  |                                      |
-| Encoding PDUs                  | Yes                              | Yes                                  |
-| Decoding PDUs                  | Yes                              | Yes                                  |
-| CRC Support                    | Yes                              | Yes                                  |
-| PDU Specifics                  |                                  |                                      |
-| Ethernet Frame                 | Yes                              | Yes (via EthernetFrame class)        |
-| Nested PDUs                    | Not Explicitly Mentioned         | Designed but not implemented         |
-| Byte Order Flexibility         | Yes (BIG_ENDIAN, LITTLE_ENDIAN)  | Yes                                  |
-| Variable Length Payload        | Yes                              | Yes                                  |
-| Additional Features            |                                  |                                      |
-| Pretty Printing                | Yes                              | Via __repr__ method                  |
-| Metadata Support               | Through PDUInfo                  | Yes, via metadata attribute          |
+- **Base PDU Definition**: Define the structure and format of your PDUs.
+- **PDU Encoding/Decoding**: Encode and decode PDUs with various field types.
+- **Nested PDU Support**: Supports PDUs within PDUs, allowing for complex data structures.
+- **CRC32 Checksum**: Automatically compute and validate CRC32 checksums for data integrity.
+- **Field Encoding/Decoding**: Supports a variety of field types including integers, floats, strings, and arrays.
+- **Byte Order Conversion**: Flexibly handle big-endian and little-endian byte orders.
+- **Metadata Storage**: Store additional metadata within PDUs.
+- **Stream Writing/Reading**: Efficiently write and read PDUs to and from streams.
+- **Variable Length Encoding/Decoding**: Handle fields with variable length data.
+- **Pretty Printing of PDUs**: Generate human-readable representations of PDUs.
+- **PDU Equality based on Fields**: Compare PDUs based on their field values.
+- **Serialization and Deserialization**: Serialize PDU definitions to JSON and deserialize them back to PDU objects.
 
 ## Usage
 
+### Creating PDU Formats
+
+You can create PDU formats using the user-friendly API:
+
 ```python
-from ProtocolDataUnits.pdu import PDU, EthernetFrame
+from ProtocolDataUnits.pdu import create_pdu_format, PDU
 
-# Create a PDU
-pdu = PDU(type=0x01, duration=500, payload=b'\x01\x02\x03\x04')
-encoded_pdu = pdu.encode()
-decoded_pdu = PDU.decode(encoded_pdu)
-
-# Create an Ethernet Frame
-frame = EthernetFrame(
-    dstaddr=(0x01, 0x02, 0x03, 0x04, 0x05, 0x06),
-    srcaddr=(0x11, 0x12, 0x13, 0x14, 0x15, 0x16),
-    ethtype=0x0800,
-    payload=bytes([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08])
+# Create a simple PDU format
+my_pdu_format = create_pdu_format(
+    24, 'big',
+    ('uint8', 'type'),
+    ('float', 'value1'),
+    ('double', 'value2')
 )
-encoded_frame = frame.encode()
-decoded_frame = EthernetFrame.decode(encoded_frame)
+
+# Encode data
+encoded_bytes = my_pdu_format.encode({'type': 7, 'value1': 3.14, 'value2': 6.28})
+print(f"Encoded Bytes: {encoded_bytes}")
+
+# Decode data
+decoded_data = my_pdu_format.decode(encoded_bytes)
+print(f"Decoded Data: {decoded_data}")
+```
+
+### Nested PDU Example
+
+```python
+# Define a nested PDU format
+nested_pdu = create_pdu_format(
+    8, 'big',
+    ('uint8', 'nested_type'),
+    ('uint8', 'nested_value')
+)
+
+# Define the main PDU format containing the nested PDU
+main_pdu = create_pdu_format(
+    16, 'big',
+    ('uint8', 'type'),
+    ('nested_pdu', 'nested', nested_pdu)
+)
+
+# Encode data with nested PDU
+encoded_bytes = main_pdu.encode({'type': 7, 'nested': {'nested_type': 1, 'nested_value': 2}})
+print(f"Encoded Bytes: {encoded_bytes}")
+
+# Decode data with nested PDU
+decoded_data = main_pdu.decode(encoded_bytes)
+print(f"Decoded Data: {decoded_data}")
+```
+
+### Serialization and Deserialization
+
+```python
+# Create a PDU with various field types
+my_pdu = PDU().length(68).order('big').uint8('type').float('value1').double('value2').fixed_string('fixed_str', 10).length_prefixed_string('length_str').variable_length_array('array', 'uint8').padding(0xff)
+encoded_bytes = my_pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28, 'fixed_str': 'hello', 'length_str': 'dynamic string', 'array': [1, 2, 3, 4, 5]}, compress=True)
+print(f"Encoded Bytes: {encoded_bytes}")
+
+# Decode the PDU
+decoded_data = my_pdu.decode(encoded_bytes, decompress=True)
+print(f"Decoded Data: {decoded_data}")
+
+# Serialize to JSON
+json_str = my_pdu.to_json()
+print(f"Serialized PDU to JSON: {json_str}")
+
+# Deserialize from JSON
+new_pdu = PDU.from_json(json_str)
+print(f"Deserialized PDU from JSON: {new_pdu.to_json()}")
+
+# Encode and decode using the deserialized PDU
+encoded_bytes_new = new_pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28, 'fixed_str': 'hello', 'length_str': 'dynamic string', 'array': [1, 2, 3, 4, 5]}, compress=True)
+print(f"Encoded Bytes (new PDU): {encoded_bytes_new}")
+
+decoded_data_new = new_pdu.decode(encoded_bytes_new, decompress=True)
+print(f"Decoded Data (new PDU): {decoded_data_new}")
 ```
 
 ## Contributing
@@ -84,4 +119,4 @@ Please make sure to update tests as appropriate.
 [MIT](https://choosealicense.com/licenses/mit/)
 
 ## References:
-1. [ProtocolDataUnits.jl](https://github.com/org-arl/ProtocolDataUnits.jl.git) by [Dr Mandar Chitre](https://github.com/mchitre), [ARL](https://github.com/org-arl)
+1. [ProtocolDataUnits.jl](https://github.com/org-arl/ProtocolDataUnits.jl.git) by [Dr. Mandar Chitre](https://github.com/mchitre), [ARL](https://github.com/org-arl)
