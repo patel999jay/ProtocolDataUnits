@@ -7,35 +7,16 @@
 
 import struct
 import binascii
-import io
 import logging
-from loguru import logger # pip install loguru
-import zlib
-import json
-
-# Constants
-DEFAULT_BYTE_ORDER = '>'
-
-
-# Set up logging configuration
-logging.basicConfig(level=logging.INFO)
-
-
-import struct
-import binascii
-import io
-import logging
-import json
-import zlib
 from loguru import logger
+import zlib
+import json
 
 # Constants
 DEFAULT_BYTE_ORDER = '>'
 
-
 # Set up logging configuration
 logging.basicConfig(level=logging.INFO)
-
 
 class PDU:
     def __init__(self):
@@ -138,12 +119,16 @@ class PDU:
             self.default_values[name] = default
         return self
 
+    def nested_pdu(self, name, pdu):
+        self.fields.append(('nested_pdu', name, pdu))
+        return self
+
     @staticmethod
     def compute_crc(data):
         crc = binascii.crc32(data) & 0xffffffff
         logging.info(f"Data for CRC32: {data.hex()}, CRC32: {crc}")
         return crc
-
+    
     @logger.catch
     def encode(self, data, compress=False):
         encoded = bytearray()
@@ -183,11 +168,15 @@ class PDU:
             elif field_type == 'variable_length_array':
                 length_prefix = struct.pack(self.byte_order + 'I', len(value_to_encode))
                 element_format = {'uint8': 'B', 'int8': 'b', 'uint16': 'H', 'int16': 'h',
-                                  'uint32': 'I', 'int32': 'i', 'uint64': 'Q', 'int64': 'q',
-                                  'float': 'f', 'double': 'd'}[value]
+                                'uint32': 'I', 'int32': 'i', 'uint64': 'Q', 'int64': 'q',
+                                'float': 'f', 'double': 'd'}[value]
                 encoded_value = length_prefix
                 for elem in value_to_encode:
                     encoded_value += struct.pack(self.byte_order + element_format, elem)
+            elif field_type == 'nested_pdu':
+                nested_pdu = value
+                nested_encoded = nested_pdu.encode(value_to_encode)
+                encoded_value = struct.pack(self.byte_order + 'I', len(nested_encoded)) + nested_encoded
             elif field_type == 'filler':
                 encoded_value = b'\x00' * value_to_encode
             elif field_type == 'padding':
@@ -256,6 +245,13 @@ class PDU:
                     elem, = struct.unpack_from(self.byte_order + element_format, data, offset)
                     decoded[name].append(elem)
                     offset += struct.calcsize(element_format)
+            elif field_type == 'nested_pdu':
+                nested_pdu = value
+                nested_length, = struct.unpack_from(self.byte_order + 'I', data, offset)
+                offset += 4
+                nested_data = data[offset:offset + nested_length]
+                decoded[name] = nested_pdu.decode(nested_data)
+                offset += nested_length
 
         # Extract the CRC from the end of the data
         crc_expected = struct.unpack_from(self.byte_order + 'I', data, len(data) - 4)[0]
@@ -284,7 +280,7 @@ class PDU:
         for field in data['fields']:
             field_name = field[0]
             field_args = field[1:]
-            if field_name in ['fixed_string', 'variable_length_array']:
+            if field_name in ['fixed_string', 'variable_length_array', 'nested_pdu']:
                 pdu = getattr(pdu, field_name)(*field_args)
             elif field_name == 'padding':
                 pdu = pdu.padding(field_args[1])
@@ -339,6 +335,17 @@ if __name__ == "__main__":
     print("===========")
 
     print("===========")
+    print("Nested PDU Example")
+    print("===========")
+    nested_pdu = PDU().length(8).order('big').uint8('nested_type').uint8('nested_value')
+    main_pdu = PDU().length(16).order('big').uint8('type').nested_pdu('nested', nested_pdu)
+    encoded_bytes = main_pdu.encode({'type': 7, 'nested': {'nested_type': 1, 'nested_value': 2}})
+    decoded_data = main_pdu.decode(encoded_bytes)
+    print(f"Encoded Bytes: {encoded_bytes}")
+    print(f"Decoded Data: {decoded_data}")
+    print("===========")
+
+    print("===========")
     print("Serialization and Deserialization Example")
     print("===========")
     my_pdu = PDU().length(68).order('big').uint8('type').float('value1').double('value2').fixed_string('fixed_str', 10).length_prefixed_string('length_str').variable_length_array('array', 'uint8').padding(0xff)
@@ -365,7 +372,6 @@ if __name__ == "__main__":
     decoded_data_new = new_pdu.decode(encoded_bytes_new, decompress=True)
     print(f"Decoded Data (new PDU): {decoded_data_new}")
     print("===========")
-
 
     """
     ===========
@@ -400,6 +406,16 @@ if __name__ == "__main__":
     INFO:root:Data for CRC32: 07000000050102030405, CRC32: 3501362261
     Encoded Bytes: b'\x07\x00\x00\x00\x05\x01\x02\x03\x04\x05\xd0\xb2\x8cU'
     Decoded Data: {'type': 7, 'array': [1, 2, 3, 4, 5]}
+    ===========
+    ===========
+    Nested PDU Example
+    ===========
+    INFO:root:Data for CRC32: 0102, CRC32: 3066839698
+    INFO:root:Data for CRC32: 07000000060102b6cc4292, CRC32: 3960647709
+    INFO:root:Data for CRC32: 0102, CRC32: 3066839698
+    INFO:root:Data for CRC32: 07000000060102b6cc4292, CRC32: 3960647709
+    Encoded Bytes: b'\x07\x00\x00\x00\x06\x01\x02\xb6\xccB\x92\xec\x12\xb0\x1d'
+    Decoded Data: {'type': 7, 'nested': {'nested_type': 1, 'nested_value': 2}}
     ===========
     ===========
     Serialization and Deserialization Example
