@@ -1,54 +1,53 @@
-from ProtocolDataUnits.pdu import PDU, EthernetFrame
-import logging
+from ProtocolDataUnits.pdu import PDU, create_pdu_format
+import unittest
+import struct
 
-# Configuring logging for the tests
-logging.basicConfig(level=logging.DEBUG)
+class TestPDU(unittest.TestCase):
+    def setUp(self):
+        self.pdu = PDU().length(24).order('big').uint8('type').float('value1').double('value2').padding(0xff)
 
+    def test_encode(self):
+        encoded_bytes = self.pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28})
+        expected_bytes = b'\x07' + struct.pack('>f', 3.14) + struct.pack('>d', 6.28) + b'\xff' * 7
+        self.assertEqual(encoded_bytes[:-4], expected_bytes)  # Compare data except CRC
 
-def test_pdu_encoding_decoding():
-    pdu = PDU(type=0x01, duration=500, payload=b'\x01\x02\x03\x04')
-    encoded_pdu = pdu.encode()
-    logging.debug(f"Encoded PDU: {encoded_pdu.hex()}")
-    decoded = PDU.decode(encoded_pdu)
-    logging.debug(f"Decoded PDU: {decoded}")
-    assert pdu == decoded, "Encoded and decoded PDU should be equal"
+    def test_decode(self):
+        encoded_bytes = self.pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28})
+        decoded_data = self.pdu.decode(encoded_bytes)
+        expected_data = {'type': 7, 'value1': 3.14, 'value2': 6.28}
+        self.assertEqual(decoded_data['type'], expected_data['type'])
+        self.assertAlmostEqual(decoded_data['value1'], expected_data['value1'], places=5)
+        self.assertAlmostEqual(decoded_data['value2'], expected_data['value2'], places=5)
 
-
-def test_pdu_metadata():
-    pdu = PDU(type=0x01, duration=500, payload=b'\x01\x02\x03\x04')
-    pdu_info = PDUInfo(length=4, metadata={
-                       "source": "deviceA", "destination": "deviceB"})
-    logging.debug(pdu_info)
-    pdu.set_metadata("info", pdu_info)
-    retrieved_info = pdu.get_metadata("info")
-    logging.debug(f"Retrieved metadata: {retrieved_info}")
-    assert pdu_info == retrieved_info, "Metadata set and retrieved should be equal"
-
-
-def test_ethernet_frame_encoding_decoding():
-    frame = EthernetFrame(
-        dstaddr=(0x01, 0x02, 0x03, 0x04, 0x05, 0x06),
-        srcaddr=(0x11, 0x12, 0x13, 0x14, 0x15, 0x16),
-        ethtype=0x0800,
-        payload=bytes([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08])
-    )
-
-    # Convert to a byte array
-    encoded_bytes = frame.encode()
-    logging.debug(f"encoded bytes: {encoded_bytes}")
-
-    # Convert back to Ethernet frame
-    decoded = EthernetFrame.decode(encoded_bytes)
-    logging.debug(f"decoded bytes: {decoded}")
-
-    # Check that they are the same
-    assert frame.dstaddr == decoded.dstaddr, "Destination address should be equal"
-    assert frame.srcaddr == decoded.srcaddr, "Source address should be equal"
-    assert frame.ethtype == decoded.ethtype, "Ethernet type should be equal"
-    assert frame.payload == decoded.payload, "Payloads should be equal"
+    def test_crc_check(self):
+        encoded_bytes = self.pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28})
+        computed_crc = PDU.compute_crc(encoded_bytes[:-4])
+        expected_crc = int.from_bytes(encoded_bytes[-4:], byteorder='big')
+        self.assertEqual(computed_crc, expected_crc)
 
 
-if __name__ == "__main__":
-    test_pdu_encoding_decoding()
-    test_pdu_metadata()
-    test_ethernet_frame_encoding_decoding()
+    def test_invalid_crc(self):
+        encoded_bytes = self.pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28})
+        # Manually modify the CRC to an incorrect value
+        modified_bytes = bytearray(encoded_bytes)
+        modified_bytes[-1] = 0x00  # Change last byte of CRC
+        with self.assertRaises(ValueError):
+            self.pdu.decode(bytes(modified_bytes))
+
+    def test_create_pdu_format(self):
+        fields = [
+            ('uint8', 'type'),
+            ('float', 'value1'),
+            ('double', 'value2'),
+            ('padding', 0xff)
+        ]
+        dynamic_pdu = create_pdu_format(24, 'big', *fields)
+        encoded_bytes = dynamic_pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28})
+        decoded_data = dynamic_pdu.decode(encoded_bytes)
+        expected_data = {'type': 7, 'value1': 3.14, 'value2': 6.28}
+        self.assertEqual(decoded_data['type'], expected_data['type'])
+        self.assertAlmostEqual(decoded_data['value1'], expected_data['value1'], places=5)
+        self.assertAlmostEqual(decoded_data['value2'], expected_data['value2'], places=5)
+
+if __name__ == '__main__':
+    unittest.main()
