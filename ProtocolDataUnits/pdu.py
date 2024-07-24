@@ -295,14 +295,13 @@ class PDU:
                     pdu = getattr(pdu, field_name)(*field_args)
         return pdu
 
-# Usage example
 if __name__ == "__main__":
     # Example for dynamic PDU format definition
     print("===========")
     print("Basic Field Types Example")
     print("supports : uint8, int8, uint16, int16, uint32, int32, uint64, int64, float, double")
     print("===========")
-    my_pdu = PDU().length(24 + 4).order('big').uint8('type').float('value1').double('value2')  # Adding 4 bytes for CRC
+    my_pdu = PDU().length(24).order('big').uint8('type').float('value1').double('value2')
     encoded_bytes = my_pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28})
     decoded_data = my_pdu.decode(encoded_bytes)
     print(f"Encoded Bytes: {encoded_bytes}")
@@ -312,7 +311,7 @@ if __name__ == "__main__":
     print("===========")
     print("Fixed-Length Strings Example")
     print("===========")
-    my_pdu = PDU().length(32 + 4).order('big').uint8('type').fixed_string('fixed_str', 10)  # Adding 4 bytes for CRC
+    my_pdu = PDU().length(32).order('big').uint8('type').fixed_string('fixed_str', 10)
     encoded_bytes = my_pdu.encode({'type': 7, 'fixed_str': 'hello'})
     decoded_data = my_pdu.decode(encoded_bytes)
     print(f"Encoded Bytes: {encoded_bytes}")
@@ -322,7 +321,7 @@ if __name__ == "__main__":
     print("===========")
     print("Length-Prefixed Strings Example")
     print("===========")
-    my_pdu = PDU().length(40 + 4).order('big').uint8('type').length_prefixed_string('length_str')  # Adding 4 bytes for CRC
+    my_pdu = PDU().length(40).order('big').uint8('type').length_prefixed_string('length_str')
     encoded_bytes = my_pdu.encode({'type': 7, 'length_str': 'dynamic string'})
     decoded_data = my_pdu.decode(encoded_bytes)
     print(f"Encoded Bytes: {encoded_bytes}")
@@ -332,7 +331,7 @@ if __name__ == "__main__":
     print("===========")
     print("Variable-Length Arrays Example")
     print("===========")
-    my_pdu = PDU().length(48 + 4).order('big').uint8('type').variable_length_array('array', 'uint8')  # Adding 4 bytes for CRC
+    my_pdu = PDU().length(48).order('big').uint8('type').variable_length_array('array', 'uint8')
     encoded_bytes = my_pdu.encode({'type': 7, 'array': [1, 2, 3, 4, 5]})
     decoded_data = my_pdu.decode(encoded_bytes)
     print(f"Encoded Bytes: {encoded_bytes}")
@@ -342,21 +341,83 @@ if __name__ == "__main__":
     print("===========")
     print("Serialization and Deserialization Example")
     print("===========")
-    my_pdu = PDU().length(64 + 4).order('big').uint8('type').float('value1').double('value2').fixed_string('fixed_str', 10).length_prefixed_string('length_str').variable_length_array('array', 'uint8').padding(0xff)  # Adding 4 bytes for CRC
+    my_pdu = PDU().length(68).order('big').uint8('type').float('value1').double('value2').fixed_string('fixed_str', 10).length_prefixed_string('length_str').variable_length_array('array', 'uint8').padding(0xff)
     encoded_bytes = my_pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28, 'fixed_str': 'hello', 'length_str': 'dynamic string', 'array': [1, 2, 3, 4, 5]}, compress=True)
     print(f"Encoded Bytes: {encoded_bytes}")
+    print("===========")
 
     decoded_data = my_pdu.decode(encoded_bytes, decompress=True)
     print(f"Decoded Data: {decoded_data}")
+    print("===========")
 
     json_str = my_pdu.to_json()
     print(f"Serialized PDU to JSON:   {json_str}")
+    print("===========")
 
     new_pdu = PDU.from_json(json_str)
     print(f"Deserialized PDU from JSON: {new_pdu.to_json()}")
+    print("===========")
 
     encoded_bytes_new = new_pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28, 'fixed_str': 'hello', 'length_str': 'dynamic string', 'array': [1, 2, 3, 4, 5]}, compress=True)
     print(f"Encoded Bytes (new PDU): {encoded_bytes_new}")
+    print("===========")
 
     decoded_data_new = new_pdu.decode(encoded_bytes_new, decompress=True)
     print(f"Decoded Data (new PDU): {decoded_data_new}")
+    print("===========")
+
+
+    """
+    ===========
+    Basic Field Types Example
+    supports : uint8, int8, uint16, int16, uint32, int32, uint64, int64, float, double
+    ===========
+    INFO:root:Data for CRC32: 074048f5c340191eb851eb851f, CRC32: 2257222243
+    INFO:root:Data for CRC32: 074048f5c340191eb851eb851f, CRC32: 2257222243
+    Encoded Bytes: b'\x07@H\xf5\xc3@\x19\x1e\xb8Q\xeb\x85\x1f\x86\x8azc'
+    Decoded Data: {'type': 7, 'value1': 3.140000104904175, 'value2': 6.28}
+    ===========
+    ===========
+    Fixed-Length Strings Example
+    ===========
+    INFO:root:Data for CRC32: 0768656c6c6f0000000000, CRC32: 2760379114
+    INFO:root:Data for CRC32: 0768656c6c6f0000000000, CRC32: 2760379114
+    Encoded Bytes: b'\x07hello\x00\x00\x00\x00\x00\xa4\x88\n\xea'
+    Decoded Data: {'type': 7, 'fixed_str': 'hello'}
+    ===========
+    ===========
+    Length-Prefixed Strings Example
+    ===========
+    INFO:root:Data for CRC32: 070000000e64796e616d696320737472696e67, CRC32: 4010864400
+    INFO:root:Data for CRC32: 070000000e64796e616d696320737472696e67, CRC32: 4010864400
+    Encoded Bytes: b'\x07\x00\x00\x00\x0edynamic string\xef\x10\xef\x10'
+    Decoded Data: {'type': 7, 'length_str': 'dynamic string'}
+    ===========
+    ===========
+    Variable-Length Arrays Example
+    ===========
+    INFO:root:Data for CRC32: 07000000050102030405, CRC32: 3501362261
+    INFO:root:Data for CRC32: 07000000050102030405, CRC32: 3501362261
+    Encoded Bytes: b'\x07\x00\x00\x00\x05\x01\x02\x03\x04\x05\xd0\xb2\x8cU'
+    Decoded Data: {'type': 7, 'array': [1, 2, 3, 4, 5]}
+    ===========
+    ===========
+    Serialization and Deserialization Example
+    ===========
+    INFO:root:Data for CRC32: 074048f5c340191eb851eb851f68656c6c6f00000000000000000e64796e616d696320737472696e67000000050102030405ffffffffffffffffffffffffffff, CRC32: 1819767949
+    Encoded Bytes: b'x\x9ccw\xf0\xf8z\xd8ARnG\xe0\xebV\xf9\x8c\xd4\x9c\x9c|\x06(\xe0K\xa9\xccK\xcc\xcdLV(.)\xca\xccK\x07\x8a\xb0221\xb3\xb0\xfeG\x019\xe5%\xbd\x00!l\x1c\xff'
+    ===========
+    INFO:root:Data for CRC32: 074048f5c340191eb851eb851f68656c6c6f00000000000000000e64796e616d696320737472696e67000000050102030405ffffffffffffffffffffffffffff, CRC32: 1819767949
+    Decoded Data: {'type': 7, 'value1': 3.140000104904175, 'value2': 6.28, 'fixed_str': 'hello', 'length_str': 'dynamic string', 'array': [1, 2, 3, 4, 5]}
+    ===========
+    Serialized PDU to JSON:   {"length": 68, "byte_order": "big", "fields": [["uint8", "type", null], ["float", "value1", null], ["double", "value2", null], ["fixed_string", "fixed_str", 10], ["length_prefixed_string", "length_str", null], ["variable_length_array", "array", "uint8"], ["padding", null, 255]]}
+    ===========
+    Deserialized PDU from JSON: {"length": 68, "byte_order": "big", "fields": [["uint8", "type", null], ["float", "value1", null], ["double", "value2", null], ["fixed_string", "fixed_str", 10], ["length_prefixed_string", "length_str", null], ["variable_length_array", "array", "uint8"], ["padding", null, 255]]}
+    ===========
+    INFO:root:Data for CRC32: 074048f5c340191eb851eb851f68656c6c6f00000000000000000e64796e616d696320737472696e67000000050102030405ffffffffffffffffffffffffffff, CRC32: 1819767949
+    Encoded Bytes (new PDU): b'x\x9ccw\xf0\xf8z\xd8ARnG\xe0\xebV\xf9\x8c\xd4\x9c\x9c|\x06(\xe0K\xa9\xccK\xcc\xcdLV(.)\xca\xccK\x07\x8a\xb0221\xb3\xb0\xfeG\x019\xe5%\xbd\x00!l\x1c\xff'
+    ===========
+    INFO:root:Data for CRC32: 074048f5c340191eb851eb851f68656c6c6f00000000000000000e64796e616d696320737472696e67000000050102030405ffffffffffffffffffffffffffff, CRC32: 1819767949
+    Decoded Data (new PDU): {'type': 7, 'value1': 3.140000104904175, 'value2': 6.28, 'fixed_str': 'hello', 'length_str': 'dynamic string', 'array': [1, 2, 3, 4, 5]}
+    ===========
+    """
