@@ -264,7 +264,6 @@ class PDU:
         return decoded
 
 
-
     def to_json(self):
         pdu_info = {
             'length': self.pdu_length,
