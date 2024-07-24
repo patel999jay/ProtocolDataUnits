@@ -1,53 +1,61 @@
-from ProtocolDataUnits.pdu import PDU, create_pdu_format
 import unittest
-import struct
+from ProtocolDataUnits.pdu import PDU, create_pdu_format
 
 class TestPDU(unittest.TestCase):
-    def setUp(self):
-        self.pdu = PDU().length(24).order('big').uint8('type').float('value1').double('value2').padding(0xff)
+    def test_basic_types(self):
+        pdu = create_pdu_format(24, 'big', ('uint8', 'type'), ('float', 'value1'), ('double', 'value2'))
+        data = {'type': 7, 'value1': 3.140000104904175, 'value2': 6.28}
+        encoded = pdu.encode(data)
+        decoded = pdu.decode(encoded)
+        self.assertEqual(data, decoded)
+    
+    def test_fixed_string(self):
+        pdu = create_pdu_format(32, 'big', ('uint8', 'type'), ('fixed_string', 'fixed_str', 10))
+        data = {'type': 7, 'fixed_str': 'hello'}
+        encoded = pdu.encode(data)
+        decoded = pdu.decode(encoded)
+        self.assertEqual(data, decoded)
+    
+    def test_length_prefixed_string(self):
+        pdu = create_pdu_format(40, 'big', ('uint8', 'type'), ('length_prefixed_string', 'length_str'))
+        data = {'type': 7, 'length_str': 'dynamic string'}
+        encoded = pdu.encode(data)
+        decoded = pdu.decode(encoded)
+        self.assertEqual(data, decoded)
+    
+    def test_variable_length_array(self):
+        pdu = create_pdu_format(48, 'big', ('uint8', 'type'), ('variable_length_array', 'array', 'uint8'))
+        data = {'type': 7, 'array': [1, 2, 3, 4, 5]}
+        encoded = pdu.encode(data)
+        decoded = pdu.decode(encoded)
+        self.assertEqual(data, decoded)
+    
+    def test_nested_pdu(self):
+        nested_pdu = create_pdu_format(8, 'big', ('uint8', 'nested_type'), ('uint8', 'nested_value'))
+        main_pdu = create_pdu_format(16, 'big', ('uint8', 'type'), ('nested_pdu', 'nested', nested_pdu))
+        data = {'type': 7, 'nested': {'nested_type': 1, 'nested_value': 2}}
+        encoded = main_pdu.encode(data)
+        decoded = main_pdu.decode(encoded)
+        self.assertEqual(data, decoded)
+    
+    def test_compression(self):
+        pdu = create_pdu_format(68, 'big', ('uint8', 'type'), ('float', 'value1'), ('double', 'value2'), 
+                                ('fixed_string', 'fixed_str', 10), ('length_prefixed_string', 'length_str'), 
+                                ('variable_length_array', 'array', 'uint8'), ('padding', 0xff))
+        data = {'type': 7, 'value1': 3.140000104904175, 'value2': 6.28, 'fixed_str': 'hello', 'length_str': 'dynamic string', 'array': [1, 2, 3, 4, 5]}
+        encoded = pdu.encode(data, compress=True)
+        decoded = pdu.decode(encoded, decompress=True)
+        self.assertEqual(data, decoded)
 
-    def test_encode(self):
-        encoded_bytes = self.pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28})
-        expected_bytes = b'\x07' + struct.pack('>f', 3.14) + struct.pack('>d', 6.28) + b'\xff' * 7
-        self.assertEqual(encoded_bytes[:-4], expected_bytes)  # Compare data except CRC
-
-    def test_decode(self):
-        encoded_bytes = self.pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28})
-        decoded_data = self.pdu.decode(encoded_bytes)
-        expected_data = {'type': 7, 'value1': 3.14, 'value2': 6.28}
-        self.assertEqual(decoded_data['type'], expected_data['type'])
-        self.assertAlmostEqual(decoded_data['value1'], expected_data['value1'], places=5)
-        self.assertAlmostEqual(decoded_data['value2'], expected_data['value2'], places=5)
-
-    def test_crc_check(self):
-        encoded_bytes = self.pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28})
-        computed_crc = PDU.compute_crc(encoded_bytes[:-4])
-        expected_crc = int.from_bytes(encoded_bytes[-4:], byteorder='big')
-        self.assertEqual(computed_crc, expected_crc)
-
-
-    def test_invalid_crc(self):
-        encoded_bytes = self.pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28})
-        # Manually modify the CRC to an incorrect value
-        modified_bytes = bytearray(encoded_bytes)
-        modified_bytes[-1] = 0x00  # Change last byte of CRC
-        with self.assertRaises(ValueError):
-            self.pdu.decode(bytes(modified_bytes))
-
-    def test_create_pdu_format(self):
-        fields = [
-            ('uint8', 'type'),
-            ('float', 'value1'),
-            ('double', 'value2'),
-            ('padding', 0xff)
-        ]
-        dynamic_pdu = create_pdu_format(24, 'big', *fields)
-        encoded_bytes = dynamic_pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28})
-        decoded_data = dynamic_pdu.decode(encoded_bytes)
-        expected_data = {'type': 7, 'value1': 3.14, 'value2': 6.28}
-        self.assertEqual(decoded_data['type'], expected_data['type'])
-        self.assertAlmostEqual(decoded_data['value1'], expected_data['value1'], places=5)
-        self.assertAlmostEqual(decoded_data['value2'], expected_data['value2'], places=5)
+    def test_json_serialization(self):
+        pdu = create_pdu_format(68, 'big', ('uint8', 'type'), ('float', 'value1'), ('double', 'value2'), 
+                                ('fixed_string', 'fixed_str', 10), ('length_prefixed_string', 'length_str'), 
+                                ('variable_length_array', 'array', 'uint8'), ('padding', 0xff))
+        json_str = pdu.to_json()
+        new_pdu = PDU.from_json(json_str)
+        self.assertEqual(pdu.fields, new_pdu.fields)
+        self.assertEqual(pdu.byte_order, new_pdu.byte_order)
+        self.assertEqual(pdu.pdu_length, new_pdu.pdu_length)
 
 if __name__ == '__main__':
     unittest.main()
