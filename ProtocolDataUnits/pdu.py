@@ -19,6 +19,49 @@ DEFAULT_BYTE_ORDER = '>'
 logging.basicConfig(level=logging.INFO)
 
 class PDU:
+    """
+    The PDU (Protocol Data Unit) class represents a data structure that is used for encoding and decoding binary data.
+    It provides methods for defining the structure of the PDU, encoding data into binary format, and decoding binary data
+    back into the original structure.
+
+    Attributes:
+        fields (list): A list of tuples representing the fields of the PDU. Each tuple contains the field type, name,
+                       and optional value.
+        byte_order (str): The byte order used for encoding and decoding the PDU. It can be either 'big' or 'little'.
+        pdu_length (int): The length of the PDU in bytes.
+        default_values (dict): A dictionary containing default values for fields that are not provided during encoding.
+
+    Methods:
+        length(length): Sets the length of the PDU.
+        order(byte_order): Sets the byte order of the PDU.
+        uint8(name, value, default): Adds a uint8 field to the PDU.
+        uint16(name, value, default): Adds a uint16 field to the PDU.
+        uint32(name, value, default): Adds a uint32 field to the PDU.
+        float(name, value, default): Adds a float field to the PDU.
+        double(name, value, default): Adds a double field to the PDU.
+        int8(name, value, default): Adds an int8 field to the PDU.
+        int16(name, value, default): Adds an int16 field to the PDU.
+        int32(name, value, default): Adds an int32 field to the PDU.
+        int64(name, value, default): Adds an int64 field to the PDU.
+        uint64(name, value, default): Adds a uint64 field to the PDU.
+        filler(count): Adds a filler field to the PDU.
+        padding(value): Adds padding to the PDU.
+        fixed_string(name, length, default): Adds a fixed-length string field to the PDU.
+        length_prefixed_string(name, default): Adds a length-prefixed string field to the PDU.
+        variable_length_array(name, element_type, default): Adds a variable-length array field to the PDU.
+        nested_pdu(name, pdu): Adds a nested PDU field to the PDU.
+        compute_crc(data): Computes the CRC32 checksum of the given data.
+        encode(data, compress): Encodes the data into binary format.
+        decode(data, decompress): Decodes the binary data back into the original structure.
+
+    Example usage:
+        pdu = PDU()
+        pdu.uint8('field1', value=10)
+        pdu.uint16('field2', value=100)
+        pdu.encode({'field1': 5, 'field2': 50})
+        pdu.decode(binary_data)
+    
+    """
     def __init__(self):
         self.fields = []
         self.byte_order = DEFAULT_BYTE_ORDER
@@ -131,6 +174,36 @@ class PDU:
     
     @logger.catch
     def encode(self, data, compress=False):
+        """
+        Encodes the provided data into a PDU (Protocol Data Unit) byte array.
+
+        The encode function serializes the data fields based on the specified PDU structure. 
+        It handles various data types including integers, floats, strings, arrays, and nested PDUs. 
+        Optionally, the encoded data can be compressed using zlib.
+
+        Parameters:
+        - data (dict): A dictionary containing the field names and their corresponding values to be encoded.
+        - compress (bool): If True, the encoded data will be compressed using zlib. Default is False.
+
+        Returns:
+        - bytes: The encoded byte array representing the PDU.
+
+        Raises:
+        - ValueError: If a required field is missing in the provided data.
+
+        Field Types Handled:
+        - uint8, int8, uint16, int16, uint32, int32, uint64, int64
+        - float, double
+        - fixed_string: A string of fixed length.
+        - length_prefixed_string: A string prefixed with its length.
+        - variable_length_array: An array with a length prefix.
+        - nested_pdu: Another PDU structure embedded within the main PDU.
+        - filler: Padding bytes.
+        - padding: Additional padding to achieve the specified PDU length.
+
+        CRC Computation:
+        - A CRC32 checksum is computed and appended to the end of the encoded data to ensure data integrity.
+        """
         encoded = bytearray()
         for field_type, name, value in self.fields:
             if name is not None:
@@ -200,6 +273,38 @@ class PDU:
 
     @logger.catch
     def decode(self, data, decompress=False):
+        """
+        Decodes a PDU (Protocol Data Unit) byte array into its constituent fields.
+
+        The decode function parses the provided byte array based on the specified PDU structure, 
+        extracting the values of each field. It handles various data types including integers, 
+        floats, strings, arrays, and nested PDUs. Optionally, the input data can be decompressed 
+        using zlib.
+
+        Parameters:
+        - data (bytes): The byte array representing the encoded PDU.
+        - decompress (bool): If True, the input data will be decompressed using zlib. Default is False.
+
+        Returns:
+        - dict: A dictionary containing the decoded field names and their corresponding values.
+
+        Raises:
+        - ValueError: If the CRC checksum does not match, indicating data corruption.
+
+        Field Types Handled:
+        - uint8, int8, uint16, int16, uint32, int32, uint64, int64
+        - float, double
+        - fixed_string: A string of fixed length.
+        - length_prefixed_string: A string prefixed with its length.
+        - variable_length_array: An array with a length prefix.
+        - nested_pdu: Another PDU structure embedded within the main PDU.
+        - filler: Padding bytes.
+        - padding: Additional padding to achieve the specified PDU length.
+
+        CRC Validation:
+        - A CRC32 checksum is validated at the end of the decoded data to ensure data integrity.
+        """
+        
         if decompress:
             data = zlib.decompress(data)
 
