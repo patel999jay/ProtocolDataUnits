@@ -10,6 +10,8 @@ import binascii
 import io
 import logging
 from loguru import logger # as logging
+import zlib
+import json
 
 # Constants
 DEFAULT_BYTE_ORDER = '>'
@@ -25,6 +27,7 @@ class PDU:
         self.byte_order = DEFAULT_BYTE_ORDER
         self.pdu_length = None
         self.default_values = {}
+        self.aliases = {}
 
     def length(self, length):
         self.pdu_length = length
@@ -95,13 +98,23 @@ class PDU:
             self.default_values[name] = default
         return self
 
+    def string(self, name=None, length=None, default=None):
+        self.fields.append(('string', name, length))
+        if default is not None:
+            self.default_values[name] = default
+        return self
+
     def filler(self, count):
         self.fields.append(('filler', None, count))
         return self
 
     def padding(self, value):
         self.fields.append(('padding', None, value))
-        return self    
+        return self
+
+    def alias(self, name, alias):
+        self.aliases[alias] = name
+        return self
 
     @staticmethod
     def compute_crc(data):
@@ -110,10 +123,11 @@ class PDU:
         return crc
 
     @logger.catch
-    def encode(self, data):
+    def encode(self, data, compress=False):
         encoded = bytearray()
         for field_type, name, value in self.fields:
             if name is not None:
+                name = self.aliases.get(name, name)  # Resolve alias if any
                 if name not in data and name not in self.default_values:
                     raise ValueError(f"Missing value for field: {name}")
                 value_to_encode = data.get(name, self.default_values.get(name))
@@ -140,6 +154,8 @@ class PDU:
                 encoded_value = struct.pack(self.byte_order + 'f', value_to_encode)
             elif field_type == 'double':
                 encoded_value = struct.pack(self.byte_order + 'd', value_to_encode)
+            elif field_type == 'string':
+                encoded_value = struct.pack(f'{self.byte_order}{value_to_encode}')
             elif field_type == 'filler':
                 encoded_value = b'\x00' * value_to_encode
             elif field_type == 'padding':
@@ -155,10 +171,17 @@ class PDU:
         data_for_crc = encoded
         crc = self.compute_crc(data_for_crc)
         encoded.extend(struct.pack(self.byte_order + 'I', crc))
+
+        if compress:
+            encoded = zlib.compress(encoded)
+
         return bytes(encoded)
 
     @logger.catch
-    def decode(self, data):
+    def decode(self, data, decompress=False):
+        if decompress:
+            data = zlib.decompress(data)
+
         decoded = {}
         offset = 0
         format_map = {
@@ -182,6 +205,9 @@ class PDU:
             if field_type in format_map:
                 decoded[name], = struct.unpack_from(self.byte_order + format_map[field_type], data, offset)
                 offset += struct.calcsize(format_map[field_type])
+            elif field_type == 'string':
+                decoded[name] = data[offset:offset + value].decode()
+                offset += value
 
         # Extract the CRC from the end of the data
         crc_expected = struct.unpack_from(self.byte_order + 'I', data, self.pdu_length - 4)[0]
@@ -192,6 +218,25 @@ class PDU:
             raise ValueError(f"CRC mismatch: computed={crc_computed}, expected={crc_expected}")
 
         return decoded
+
+    def to_json(self):
+        return json.dumps({
+            'length': self.pdu_length,
+            'byte_order': 'big' if self.byte_order == '>' else 'little',
+            'fields': self.fields
+        })
+
+    @staticmethod
+    def from_json(json_str):
+        data = json.loads(json_str)
+        pdu = PDU().length(data['length']).order(data['byte_order'])
+        for field in data['fields']:
+            if field[0] == 'padding':
+                pdu = getattr(pdu, field[0])(field[2])
+            else:
+                pdu = getattr(pdu, field[0])(*field[1:])
+        return pdu
+
 
 def create_pdu_format(length, byte_order, *fields):
     pdu = PDU().length(length).order(byte_order)
@@ -205,9 +250,36 @@ if __name__ == "__main__":
     my_pdu = PDU().length(24).order('big').uint8('type').float('value1').double('value2').padding(0xff)
 
     # Encoding and decoding
-    encoded_bytes = my_pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28})
+    encoded_bytes = my_pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28}, compress=True)
     print(f"Encoded Bytes: {encoded_bytes}")
 
-    decoded_data = my_pdu.decode(encoded_bytes)
+    decoded_data = my_pdu.decode(encoded_bytes, decompress=True)
     print(f"Decoded Data: {decoded_data}")
 
+    # Serialization to JSON
+    json_str = my_pdu.to_json()
+    print(f"Serialized PDU to JSON:   {json_str}")
+
+    # Deserialization from JSON
+    new_pdu = PDU.from_json(json_str)
+    print(f"Deserialized PDU from JSON: {new_pdu.to_json()}")
+
+    # Encoding and decoding using deserialized PDU
+    encoded_bytes_new = new_pdu.encode({'type': 7, 'value1': 3.14, 'value2': 6.28}, compress=True)
+    print(f"Encoded Bytes (new PDU): {encoded_bytes_new}")
+
+    decoded_data_new = new_pdu.decode(encoded_bytes_new, decompress=True)
+    print(f"Decoded Data (new PDU): {decoded_data_new}")
+
+    """
+    INFO:root:Data for CRC: 074048f5c340191eb851eb851fffffffffffffff, CRC: 3703759078
+    Encoded Bytes: b'x\x9ccw\xf0\xf8z\xd8ARnG\xe0\xebV\xf9\xff\x10p\xe7\xd0\x83g\x00\x9d\xf7\x0f\xb4'
+    INFO:root:Data for CRC: 074048f5c340191eb851eb851fffffffffffffff, CRC: 3703759078
+    Decoded Data: {'type': 7, 'value1': 3.140000104904175, 'value2': 6.28}
+    Serialized PDU to JSON:   {"length": 24, "byte_order": "big", "fields": [["uint8", "type", null], ["float", "value1", null], ["double", "value2", null], ["padding", null, 255]]}
+    Deserialized PDU from JSON: {"length": 24, "byte_order": "big", "fields": [["uint8", "type", null], ["float", "value1", null], ["double", "value2", null], ["padding", null, 255]]}
+    INFO:root:Data for CRC: 074048f5c340191eb851eb851fffffffffffffff, CRC: 3703759078
+    Encoded Bytes (new PDU): b'x\x9ccw\xf0\xf8z\xd8ARnG\xe0\xebV\xf9\xff\x10p\xe7\xd0\x83g\x00\x9d\xf7\x0f\xb4'
+    INFO:root:Data for CRC: 074048f5c340191eb851eb851fffffffffffffff, CRC: 3703759078
+    Decoded Data (new PDU): {'type': 7, 'value1': 3.140000104904175, 'value2': 6.28}
+    """
