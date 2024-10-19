@@ -4,13 +4,26 @@
    contain the root `toctree` directive.
 
 Welcome to ProtocolDataUnits's documentation!
-=============================================
+============================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   installation
+   usage
    modules
+
+.. toctree::
+   :maxdepth: 1
+   :caption: PDU API Reference:
+
+   ProtocolDataUnits.pdu
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Examples:
+
    examples/pdu_examples
 
 Indices and tables
