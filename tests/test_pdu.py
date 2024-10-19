@@ -1,54 +1,61 @@
-from ProtocolDataUnits.pdu import PDU, EthernetFrame
-import logging
+import unittest
+from ProtocolDataUnits.pdu import PDU, create_pdu_format
 
-# Configuring logging for the tests
-logging.basicConfig(level=logging.DEBUG)
+class TestPDU(unittest.TestCase):
+    def test_basic_types(self):
+        pdu = create_pdu_format(24, 'big', ('uint8', 'type'), ('float', 'value1'), ('double', 'value2'))
+        data = {'type': 7, 'value1': 3.140000104904175, 'value2': 6.28}
+        encoded = pdu.encode(data)
+        decoded = pdu.decode(encoded)
+        self.assertEqual(data, decoded)
+    
+    def test_fixed_string(self):
+        pdu = create_pdu_format(32, 'big', ('uint8', 'type'), ('fixed_string', 'fixed_str', 10))
+        data = {'type': 7, 'fixed_str': 'hello'}
+        encoded = pdu.encode(data)
+        decoded = pdu.decode(encoded)
+        self.assertEqual(data, decoded)
+    
+    def test_length_prefixed_string(self):
+        pdu = create_pdu_format(40, 'big', ('uint8', 'type'), ('length_prefixed_string', 'length_str'))
+        data = {'type': 7, 'length_str': 'dynamic string'}
+        encoded = pdu.encode(data)
+        decoded = pdu.decode(encoded)
+        self.assertEqual(data, decoded)
+    
+    def test_variable_length_array(self):
+        pdu = create_pdu_format(48, 'big', ('uint8', 'type'), ('variable_length_array', 'array', 'uint8'))
+        data = {'type': 7, 'array': [1, 2, 3, 4, 5]}
+        encoded = pdu.encode(data)
+        decoded = pdu.decode(encoded)
+        self.assertEqual(data, decoded)
+    
+    def test_nested_pdu(self):
+        nested_pdu = create_pdu_format(8, 'big', ('uint8', 'nested_type'), ('uint8', 'nested_value'))
+        main_pdu = create_pdu_format(16, 'big', ('uint8', 'type'), ('nested_pdu', 'nested', nested_pdu))
+        data = {'type': 7, 'nested': {'nested_type': 1, 'nested_value': 2}}
+        encoded = main_pdu.encode(data)
+        decoded = main_pdu.decode(encoded)
+        self.assertEqual(data, decoded)
+    
+    def test_compression(self):
+        pdu = create_pdu_format(68, 'big', ('uint8', 'type'), ('float', 'value1'), ('double', 'value2'), 
+                                ('fixed_string', 'fixed_str', 10), ('length_prefixed_string', 'length_str'), 
+                                ('variable_length_array', 'array', 'uint8'), ('padding', 0xff))
+        data = {'type': 7, 'value1': 3.140000104904175, 'value2': 6.28, 'fixed_str': 'hello', 'length_str': 'dynamic string', 'array': [1, 2, 3, 4, 5]}
+        encoded = pdu.encode(data, compress=True)
+        decoded = pdu.decode(encoded, decompress=True)
+        self.assertEqual(data, decoded)
 
+    def test_json_serialization(self):
+        pdu = create_pdu_format(68, 'big', ('uint8', 'type'), ('float', 'value1'), ('double', 'value2'), 
+                                ('fixed_string', 'fixed_str', 10), ('length_prefixed_string', 'length_str'), 
+                                ('variable_length_array', 'array', 'uint8'), ('padding', 0xff))
+        json_str = pdu.to_json()
+        new_pdu = PDU.from_json(json_str)
+        self.assertEqual(pdu.fields, new_pdu.fields)
+        self.assertEqual(pdu.byte_order, new_pdu.byte_order)
+        self.assertEqual(pdu.pdu_length, new_pdu.pdu_length)
 
-def test_pdu_encoding_decoding():
-    pdu = PDU(type=0x01, duration=500, payload=b'\x01\x02\x03\x04')
-    encoded_pdu = pdu.encode()
-    logging.debug(f"Encoded PDU: {encoded_pdu.hex()}")
-    decoded = PDU.decode(encoded_pdu)
-    logging.debug(f"Decoded PDU: {decoded}")
-    assert pdu == decoded, "Encoded and decoded PDU should be equal"
-
-
-def test_pdu_metadata():
-    pdu = PDU(type=0x01, duration=500, payload=b'\x01\x02\x03\x04')
-    pdu_info = PDUInfo(length=4, metadata={
-                       "source": "deviceA", "destination": "deviceB"})
-    logging.debug(pdu_info)
-    pdu.set_metadata("info", pdu_info)
-    retrieved_info = pdu.get_metadata("info")
-    logging.debug(f"Retrieved metadata: {retrieved_info}")
-    assert pdu_info == retrieved_info, "Metadata set and retrieved should be equal"
-
-
-def test_ethernet_frame_encoding_decoding():
-    frame = EthernetFrame(
-        dstaddr=(0x01, 0x02, 0x03, 0x04, 0x05, 0x06),
-        srcaddr=(0x11, 0x12, 0x13, 0x14, 0x15, 0x16),
-        ethtype=0x0800,
-        payload=bytes([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08])
-    )
-
-    # Convert to a byte array
-    encoded_bytes = frame.encode()
-    logging.debug(f"encoded bytes: {encoded_bytes}")
-
-    # Convert back to Ethernet frame
-    decoded = EthernetFrame.decode(encoded_bytes)
-    logging.debug(f"decoded bytes: {decoded}")
-
-    # Check that they are the same
-    assert frame.dstaddr == decoded.dstaddr, "Destination address should be equal"
-    assert frame.srcaddr == decoded.srcaddr, "Source address should be equal"
-    assert frame.ethtype == decoded.ethtype, "Ethernet type should be equal"
-    assert frame.payload == decoded.payload, "Payloads should be equal"
-
-
-if __name__ == "__main__":
-    test_pdu_encoding_decoding()
-    test_pdu_metadata()
-    test_ethernet_frame_encoding_decoding()
+if __name__ == '__main__':
+    unittest.main()

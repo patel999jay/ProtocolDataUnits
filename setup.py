@@ -2,9 +2,10 @@ from setuptools import setup, find_packages
 
 setup(
     name="ProtocolDataUnits",
-    version="1.0.0",
+    version="1.0.1",
     packages=find_packages(exclude=('tests', 'docs')),
     install_requires=[
+        'loguru',  # Add loguru as a required dependency
         # Any dependencies project has, e.g.
         # 'requests',
     ],
