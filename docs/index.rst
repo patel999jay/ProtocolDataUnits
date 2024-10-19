@@ -11,6 +11,7 @@ Welcome to ProtocolDataUnits's documentation!
    :caption: Contents:
 
    modules
+   examples/pdu_examples
 
 Indices and tables
 ==================

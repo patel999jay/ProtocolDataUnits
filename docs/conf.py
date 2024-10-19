@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.abspath('..'))
 project = 'ProtocolDataUnits'
 copyright = '2023, Jay Patel'
 author = 'Jay Patel'
-release = '1.0.0'
+release = '1.0.1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -26,6 +26,9 @@ extensions = extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx'
 ]
+
+autodoc_member_order = 'bysource'
+autosummary_generate = True
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),

@@ -61,22 +61,25 @@ class PDU:
         It allows you to define the structure of a PDU with various field types, specify byte order, 
         and encode data into binary format or decode binary data back into structured data.
 
-        Basic Example:
+        **Basic Example**:
+        
+        .. code-block:: python
+        
             # Define a simple PDU structure with uint8 and float fields
             pdu = PDU().length(16).order('big').uint8('type').float('value')
             encoded = pdu.encode({'type': 1, 'value': 3.14})
             decoded = pdu.decode(encoded)
 
-        Note:
+        **Note:**
             For more detailed examples, refer to the `examples/pdu_examples.py` file.
 
-        Attributes:
+        **Attributes**:
             fields (list): A list of field definitions for the PDU.
             byte_order (str): Byte order for encoding/decoding, 'big' or 'little'.
             pdu_length (int): Length of the PDU in bytes.
             default_values (dict): Default values for fields.
 
-        Methods:
+        **Methods**:
             length(length): Sets the length of the PDU.
             order(byte_order): Sets the byte order of the PDU.
             encode(data, compress=False): Encodes structured data into a PDU.
