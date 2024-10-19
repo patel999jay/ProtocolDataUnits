@@ -70,21 +70,22 @@ class PDU:
             encoded = pdu.encode({'type': 1, 'value': 3.14})
             decoded = pdu.decode(encoded)
 
-        **Note:**
-            For more detailed examples, refer to the `examples/pdu_examples.py` file.
+        .. note::
+            For more detailed examples, refer to the ``examples/pdu_examples.py`` file.
 
         **Attributes**:
-            fields (list): A list of field definitions for the PDU.
-            byte_order (str): Byte order for encoding/decoding, 'big' or 'little'.
-            pdu_length (int): Length of the PDU in bytes.
-            default_values (dict): Default values for fields.
+            - **fields** (list): A list of field definitions for the PDU.
+            - **byte_order** (str): Byte order for encoding/decoding, `'big'` or `'little'`.
+            - **pdu_length** (int): Length of the PDU in bytes.
+            - **default_values** (dict): Default values for fields.
 
         **Methods**:
-            length(length): Sets the length of the PDU.
-            order(byte_order): Sets the byte order of the PDU.
-            encode(data, compress=False): Encodes structured data into a PDU.
-            decode(data, decompress=False): Decodes binary data back into structured data.
+            - **length(length)**: Sets the length of the PDU.
+            - **order(byte_order)**: Sets the byte order of the PDU.
+            - **encode(data, compress=False)**: Encodes structured data into a PDU.
+            - **decode(data, decompress=False)**: Decodes binary data back into structured data.
     """
+
     def __init__(self):
         self.fields = []
         self.byte_order = BIG_ENDIAN
