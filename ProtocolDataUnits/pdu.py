@@ -84,7 +84,7 @@ class PDU:
             order(byte_order): Sets the byte order of the PDU.
             encode(data, compress=False): Encodes structured data into a PDU.
             decode(data, decompress=False): Decodes binary data back into structured data.
-        """
+    """
     def __init__(self):
         self.fields = []
         self.byte_order = BIG_ENDIAN
