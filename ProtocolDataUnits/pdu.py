@@ -101,10 +101,10 @@ class PDU:
         Sets the length of the PDU. If the length is not provided, it will be inferred from the defined fields.
 
         **Parameters**:
-        - **length (int, optional)**: The total length of the PDU in bytes. If not provided, the length is inferred based on the fields.
+            - **length (int, optional)**: The total length of the PDU in bytes. If not provided, the length is inferred based on the fields.
 
         **Returns**:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         # Infer length if not provided.
         if length is None:
@@ -137,10 +137,10 @@ class PDU:
         Sets the byte order for the PDU.
 
         **Parameters**:
-        - **byte_order (str)**: The byte order to use. Should be 'bigendian' for big-endian or 'littleendian' for little-endian.
+            - **byte_order (str)**: The byte order to use. Should be 'bigendian' for big-endian or 'littleendian' for little-endian.
 
         **Returns**:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         # Use more descriptive endianness terms.
         self.byte_order = BIG_ENDIAN if byte_order == 'bigendian' else LITTLE_ENDIAN
@@ -151,12 +151,12 @@ class PDU:
         Adds a uint8 field to the PDU.
 
         **Parameters**:
-        - **name (str, optional)**: The name of the field.
-        - **value (int, optional)**: A specific value for the field.
-        - **default (int, optional)**: A default value to use if none is provided during encoding.
+            - **name (str, optional)**: The name of the field.
+            - **value (int, optional)**: A specific value for the field.
+            - **default (int, optional)**: A default value to use if none is provided during encoding.
 
         **Returns:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((UINT8, name, value))
         if default is not None:
@@ -168,12 +168,12 @@ class PDU:
         Adds a uint16 field to the PDU.
 
         **Parameters**:
-        - **name (str, optional)**: The name of the field.
-        - **value (int, optional)**: A specific value for the field.
-        - **default (int, optional)**: A default value to use if none is provided during encoding.
+            - **name (str, optional)**: The name of the field.
+            - **value (int, optional)**: A specific value for the field.
+            - **default (int, optional)**: A default value to use if none is provided during encoding.
 
         **Returns**:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((UINT16, name, value))
         if default is not None:
@@ -185,12 +185,12 @@ class PDU:
         Adds a uint32 field to the PDU.
 
         **Parameters**:
-        - **name (str, optional)**: The name of the field.
-        - **value (int, optional)**: A specific value for the field.
-        - **default (int, optional)**: A default value to use if none is provided during encoding.
+            - **name (str, optional)**: The name of the field.
+            - **value (int, optional)**: A specific value for the field.
+            - **default (int, optional)**: A default value to use if none is provided during encoding.
 
         **Returns**:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((UINT32, name, value))
         if default is not None:
@@ -202,12 +202,12 @@ class PDU:
         Adds a float field to the PDU.
 
         **Parameters**:
-        - **name (str, optional)**: The name of the field.
-        - **value (float, optional)**: A specific value for the field.
-        - **default (float, optional)**: A default value to use if none is provided during encoding.
+            - **name (str, optional)**: The name of the field.
+            - **value (float, optional)**: A specific value for the field.
+            - **default (float, optional)**: A default value to use if none is provided during encoding.
 
         **Returns:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((FLOAT, name, value))
         if default is not None:
@@ -219,12 +219,12 @@ class PDU:
         Adds a double field to the PDU.
 
         **Parameters:
-        - **name (str, optional)**: The name of the field.
-        - **value (float, optional)**: A specific value for the field.
-        - **default (float, optional)**: A default value to use if none is provided during encoding.
+            - **name (str, optional)**: The name of the field.
+            - **value (float, optional)**: A specific value for the field.
+            - **default (float, optional)**: A default value to use if none is provided during encoding.
 
         **Returns:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((DOUBLE, name, value))
         if default is not None:
@@ -236,12 +236,12 @@ class PDU:
         Adds an int8 field to the PDU.
 
         **Parameters**:
-        - **name (str, optional)**: The name of the field.
-        - **value (int, optional)**: A specific value for the field.
-        - **default (int, optional)**: A default value to use if none is provided during encoding.
+            - **name (str, optional)**: The name of the field.
+            - **value (int, optional)**: A specific value for the field.
+            - **default (int, optional)**: A default value to use if none is provided during encoding.
 
         **Return**s:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((INT8, name, value))
         if default is not None:
@@ -253,12 +253,12 @@ class PDU:
         Adds an int16 field to the PDU.
 
         **Parameters**:
-        - **name (str, optional)**: The name of the field.
-        - **value (int, optional)**: A specific value for the field.
-        - **default (int, optional)**: A default value to use if none is provided during encoding.
+            - **name (str, optional)**: The name of the field.
+            - **value (int, optional)**: A specific value for the field.
+            - **default (int, optional)**: A default value to use if none is provided during encoding.
 
         **Returns:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((INT16, name, value))
         if default is not None:
@@ -270,12 +270,12 @@ class PDU:
         Adds an int32 field to the PDU.
 
         **Parameters**:
-        - **name (str, optional)**: The name of the field.
-        - **value (int, optional)**: A specific value for the field.
-        - **default (int, optional)**: A default value to use if none is provided during encoding.
+            - **name (str, optional)**: The name of the field.
+            - **value (int, optional)**: A specific value for the field.
+            - **default (int, optional)**: A default value to use if none is provided during encoding.
 
         **Returns**:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((INT32, name, value))
         if default is not None:
@@ -287,12 +287,12 @@ class PDU:
         Adds an int64 field to the PDU.
 
         **Parameter**:
-        - **name (str, optional)**: The name of the field.
-        - **value (int, optional)**: A specific value for the field.
-        - **default (int, optional)**: A default value to use if none is provided during encoding.
+            - **name (str, optional)**: The name of the field.
+            - **value (int, optional)**: A specific value for the field.
+            - **default (int, optional)**: A default value to use if none is provided during encoding.
 
         **Returns**:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((INT64, name, value))
         if default is not None:
@@ -304,12 +304,12 @@ class PDU:
         Adds a uint64 field to the PDU.
 
         **Parameters**:
-        - **name (str, optional)**: The name of the field.
-        - **value (int, optional)**: A specific value for the field.
-        - **default (int, optional)**: A default value to use if none is provided during encoding.
+            - **name (str, optional)**: The name of the field.
+            - **value (int, optional)**: A specific value for the field.
+            - **default (int, optional)**: A default value to use if none is provided during encoding.
 
         **Returns:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((UINT64, name, value))
         if default is not None:
@@ -322,10 +322,10 @@ class PDU:
         Adds a filler field with a specified number of bytes.
 
         **Parameters**:
-        - **count (int)**: The number of bytes for the filler.
+            - **count (int)**: The number of bytes for the filler.
 
         **Returns**:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((FILLER, None, count))
         return self
@@ -335,10 +335,10 @@ class PDU:
         Adds padding bytes to the PDU.
 
         **Parameters**:
-        - **value (int)**: The value to be used for the padding bytes.
+            - **value (int)**: The value to be used for the padding bytes.
 
         **Returns**:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((PADDING, None, value))
         return self
@@ -352,9 +352,9 @@ class PDU:
         If the string is longer, it will be truncated to fit the specified length.
 
         **Parameters**:
-        - **name (str)**: The name of the field.
-        - **length (int)**: The length of the string in bytes.
-        - **default (str, optional)**: A default value to use if none is provided during encoding.
+            - **name (str)**: The name of the field.
+            - **length (int)**: The length of the string in bytes.
+            - **default (str, optional)**: A default value to use if none is provided during encoding.
 
         **Example**:
         
@@ -364,7 +364,7 @@ class PDU:
             Encoded: `b'hello\x00\x00\x00\x00\x00'` (10 bytes, with 5 null bytes for padding)
 
         **Returns**:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((FIXED_STRING, name, length))
         if default is not None:
@@ -379,8 +379,8 @@ class PDU:
         followed by the string data itself.
 
         **Parameters**:
-        - **name (str)**: The name of the field.
-        - **default (str, optional)**: A default value to use if none is provided during encoding.
+            - **name (str)**: The name of the field.
+            - **default (str, optional)**: A default value to use if none is provided during encoding.
 
         **Example**:
         
@@ -389,7 +389,7 @@ class PDU:
             Encoded: b'\\x07\\x00\\x00\\x00example' (where \\x07\\x00\\x00\\x00 indicates length 7)
 
         **Returns**:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((LENGTH_PREFIXED_STRING, name, None))
         if default is not None:
@@ -405,9 +405,9 @@ class PDU:
         the specified `element_type`.
 
         **Parameters**:
-        - **name (str)**: The name of the field.
-        - **element_type (str)**: The type of the elements in the array (e.g., 'uint8', 'int16').
-        - **default (list, optional)**: A default array to use if none is provided during encoding.
+            - **name (str)**: The name of the field.
+            - **element_type (str)**: The type of the elements in the array (e.g., 'uint8', 'int16').
+            - **default (list, optional)**: A default array to use if none is provided during encoding.
 
         **Example**:
         
@@ -419,7 +419,7 @@ class PDU:
                 - `b'\x01\x02\x03\x04\x05'` represents the array elements encoded as `uint8`.
 
         **Returns**:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((VARIABLE_LENGTH_ARRAY, name, element_type))
         if default is not None:
@@ -432,11 +432,11 @@ class PDU:
         This is same as the pdu_fragment.
 
         **Parameters**:
-        - **name (str)**: The name of the field.
-        - **pdu (PDU)**: An instance of a PDU that represents the nested structure.
+            - **name (str)**: The name of the field.
+            - **pdu (PDU)**: An instance of a PDU that represents the nested structure.
 
         Returns:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((PDU_FRAGMENT, name, pdu))
         return self
@@ -446,11 +446,11 @@ class PDU:
         Adds a nested PDU (sub-PDU) field to the current PDU structure.
 
         **Parameters**:
-        - **name (str)**: The name of the field.
-        - **pdu (PDU)**: An instance of a PDU that represents the nested structure.
+            - **name (str)**: The name of the field.
+            - **pdu (PDU)**: An instance of a PDU that represents the nested structure.
 
         **Returns**:
-        - **self**: Returns the instance of the current PDU for method chaining.
+            - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((PDU_FRAGMENT, name, pdu))
         return self
@@ -471,27 +471,27 @@ class PDU:
         Optionally, the encoded data can be compressed using zlib.
 
         **Parameters**:
-        - **data (dict)**: A dictionary containing the field names and their corresponding values to be encoded.
-        - **compress (bool)**: If True, the encoded data will be compressed using zlib. Default is False.
+            - **data (dict)**: A dictionary containing the field names and their corresponding values to be encoded.
+            - **compress (bool)**: If True, the encoded data will be compressed using zlib. Default is False.
 
         **Returns**:
-        - **bytes**: The encoded byte array representing the PDU.
+            - **bytes**: The encoded byte array representing the PDU.
 
         **Raises**:
-        - **ValueError**: If a required field is missing in the provided data.
+            - **ValueError**: If a required field is missing in the provided data.
 
         **Field Types Handled**:
-        - uint8, int8, uint16, int16, uint32, int32, uint64, int64
-        - float, double
-        - **fixed_string**: A string of fixed length.
-        - **length_prefixed_string**: A string prefixed with its length.
-        - **variable_length_array**: An array with a length prefix.
-        - **pdu_fragment**: Another PDU structure embedded within the main PDU.
-        - **filler: Padding bytes.
-        - **padding**: Additional padding to achieve the specified PDU length.
+            - uint8, int8, uint16, int16, uint32, int32, uint64, int64
+            - float, double
+            - **fixed_string**: A string of fixed length.
+            - **length_prefixed_string**: A string prefixed with its length.
+            - **variable_length_array**: An array with a length prefix.
+            - **pdu_fragment**: Another PDU structure embedded within the main PDU.
+            - **filler: Padding bytes.
+            - **padding**: Additional padding to achieve the specified PDU length.
 
         **CRC Computation**:
-        - A CRC32 checksum is computed and appended to the end of the encoded data to ensure data integrity.
+            - A CRC32 checksum is computed and appended to the end of the encoded data to ensure data integrity.
         """
         encoded = bytearray()
         if self.pdu_length is None:
@@ -603,27 +603,27 @@ class PDU:
         using zlib.
 
         **Parameters**:
-        - **data (bytes)**: The byte array representing the encoded PDU.
-        - **decompress (bool)**: If True, the input data will be decompressed using zlib. Default is False.
+            - **data (bytes)**: The byte array representing the encoded PDU.
+            - **decompress (bool)**: If True, the input data will be decompressed using zlib. Default is False.
 
         **Returns**:
-        - **dict**: A dictionary containing the decoded field names and their corresponding values.
+            - **dict**: A dictionary containing the decoded field names and their corresponding values.
 
         **Raises**:
-        - **ValueError**: If the CRC checksum does not match, indicating data corruption.
+            - **ValueError**: If the CRC checksum does not match, indicating data corruption.
 
         **Field Types Handled**:
-        - uint8, int8, uint16, int16, uint32, int32, uint64, int64
-        - float, double
-        - **fixed_string**: A string of fixed length.
-        - **length_prefixed_string**: A string prefixed with its length.
-        - **variable_length_array**: An array with a length prefix.
-        - **pdu_fragment**: Another PDU structure embedded within the main PDU.
-        - **filler**: Padding bytes.
-        -**padding**: Additional padding to achieve the specified PDU length.
+            - uint8, int8, uint16, int16, uint32, int32, uint64, int64
+            - float, double
+            - **fixed_string**: A string of fixed length.
+            - **length_prefixed_string**: A string prefixed with its length.
+            - **variable_length_array**: An array with a length prefix.
+            - **pdu_fragment**: Another PDU structure embedded within the main PDU.
+            - **filler**: Padding bytes.
+            - **padding**: Additional padding to achieve the specified PDU length.
 
         CRC Validation:
-        - A CRC32 checksum is validated at the end of the decoded data to ensure data integrity.
+            - A CRC32 checksum is validated at the end of the decoded data to ensure data integrity.
         """
 
         if decompress:
@@ -721,13 +721,13 @@ def create_pdu_format(length, byte_order, *fields):
     Create a PDU format using a simplified and user-friendly API.
 
     **Parameters**:
-    - **length (int)**: The total length of the PDU.
-    - **byte_order (str)**: The byte order to use ('big' for big-endian or 'little' for little-endian).
-    - ** *fields (tuples)**: A variable number of tuples, each representing a field in the PDU. 
+        - **length (int)**: The total length of the PDU.
+        - **byte_order (str)**: The byte order to use ('big' for big-endian or 'little' for little-endian).
+        - ** *fields (tuples)**: A variable number of tuples, each representing a field in the PDU. 
                         Each tuple should contain the field type followed by the necessary arguments.
 
     **Returns**:
-    - **PDU**: An instance of the PDU class with the specified format.
+        - **PDU**: An instance of the PDU class with the specified format.
     """
     pdu = PDU().length(length).order(byte_order)
     for field in fields:
