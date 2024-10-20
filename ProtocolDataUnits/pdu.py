@@ -155,7 +155,7 @@ class PDU:
             - **value (int, optional)**: A specific value for the field.
             - **default (int, optional)**: A default value to use if none is provided during encoding.
 
-        **Returns:
+        **Returns**:
             - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((UINT8, name, value))
@@ -206,7 +206,7 @@ class PDU:
             - **value (float, optional)**: A specific value for the field.
             - **default (float, optional)**: A default value to use if none is provided during encoding.
 
-        **Returns:
+        **Returns**:
             - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((FLOAT, name, value))
@@ -240,7 +240,7 @@ class PDU:
             - **value (int, optional)**: A specific value for the field.
             - **default (int, optional)**: A default value to use if none is provided during encoding.
 
-        **Return**s:
+        **Returns**:
             - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((INT8, name, value))
@@ -257,7 +257,7 @@ class PDU:
             - **value (int, optional)**: A specific value for the field.
             - **default (int, optional)**: A default value to use if none is provided during encoding.
 
-        **Returns:
+        **Returns**:
             - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((INT16, name, value))
@@ -308,7 +308,7 @@ class PDU:
             - **value (int, optional)**: A specific value for the field.
             - **default (int, optional)**: A default value to use if none is provided during encoding.
 
-        **Returns:
+        **Returns**:
             - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((UINT64, name, value))
@@ -435,7 +435,7 @@ class PDU:
             - **name (str)**: The name of the field.
             - **pdu (PDU)**: An instance of a PDU that represents the nested structure.
 
-        Returns:
+        **Returns**:
             - **self**: Returns the instance of the current PDU for method chaining.
         """
         self.fields.append((PDU_FRAGMENT, name, pdu))
@@ -723,7 +723,7 @@ def create_pdu_format(length, byte_order, *fields):
     **Parameters**:
         - **length (int)**: The total length of the PDU.
         - **byte_order (str)**: The byte order to use ('big' for big-endian or 'little' for little-endian).
-        - ** *fields (tuples)**: A variable number of tuples, each representing a field in the PDU. 
+        - ***fields (tuples)**: A variable number of tuples, each representing a field in the PDU. 
                         Each tuple should contain the field type followed by the necessary arguments.
 
     **Returns**:
