@@ -10,7 +10,10 @@ Welcome to ProtocolDataUnits's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   modules
+   installation
+   usage
+   api_reference
+   examples
 
 Indices and tables
 ==================

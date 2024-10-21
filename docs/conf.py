@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'ProtocolDataUnits'
-copyright = '2023, Jay Patel'
+copyright = '2024, Jay Patel'
 author = 'Jay Patel'
 release = '1.0.1'
 
@@ -26,6 +26,10 @@ extensions = extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx'
 ]
+
+autodoc_default_options = {
+    'autosummary': True,
+}
 
 autodoc_member_order = 'bysource'
 autosummary_generate = True
@@ -45,6 +49,11 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
+
+# -- Options for HTMLHelp output ---------------------------------------------
+
+# Output file base name for HTML help builder.
+htmlhelp_basename = 'ProtocolDataUnitsdoc'
 
 # -- Options for EPUB output
 epub_show_urls = 'footnote'

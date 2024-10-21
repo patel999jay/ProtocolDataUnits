@@ -1,8 +1,8 @@
-PDU Examples
+Examples
 ============
 
 This section provides detailed examples of using the `ProtocolDataUnits` library.
 
-.. literalinclude:: ../examples/pdu_examples.py
+.. literalinclude:: ../ProtocolDataUnits/examples/pdu_examples.py
    :language: python
-   :caption: Example usage of ProtocolDataUnits
+   :linenos:
