@@ -223,6 +223,20 @@ Padding is used to align data to a specific byte boundary or to ensure that the 
 - Padding ensures data alignment but may add extra bytes to the encoded PDU.
 
 
+### CITATION
+- If you use ProtocolDataUnits for your research, please cite it as below:
+    ```BibTex
+    @software{Patel_ProtocolDataUnits_2023,
+    author = {Patel, Jay and Chitre, Mandar},
+    license = {MIT},
+    month = oct,
+    title = {{ProtocolDataUnits}},
+    url = {https://github.com/patel999jay/ProtocolDataUnits},
+    version = {1.0.0},
+    year = {2023}
+    }
+    ```
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
