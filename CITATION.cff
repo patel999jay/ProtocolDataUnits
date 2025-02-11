@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "ProtocolDataUnits"
+abstract: "A Python package for encoding and decoding Protocol Data Units (PDUs). This repository provides functionality to process PDUs efficiently, supporting various formats and custom structures."
+authors:
+  - family-names: "Patel"
+    given-names: "Jay"
+    affiliation: "Dalhousie University, NS, Canada"
+    orcid: "https://orcid.org/0000-0003-0811-3977"
+  - family-names: "Chitre"
+    given-names: "Mandar"
+    affiliation: "National University of Singapore, Singapore"
+    orcid: "https://orcid.org/0000-0001-6243-7871"  
+version: "1.0.0"  
+date-released: 2023-10-06  
+url: "https://github.com/patel999jay/ProtocolDataUnits"
+repository-code: "https://github.com/patel999jay/ProtocolDataUnits"
+license: "MIT"  

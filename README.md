@@ -1,6 +1,9 @@
 # ProtocolDataUnits
 
 [![Documentation](https://readthedocs.org/projects/protocoldataunits/badge/?version=latest)](https://protocoldataunits.readthedocs.io/en/latest/?badge=latest)
+[![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.png?v=103)](https://github.com/ellerbrock/open-source-badges/)
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
+[![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 
 ProtocolDataUnits is a Python toolset for encoding and decoding Protocol Data Units (PDUs). It is inspired by `ProtocolDataUnits.jl` by [Dr. Mandar Chitre](https://github.com/mchitre), [ARL](https://github.com/org-arl).
 
@@ -219,6 +222,20 @@ Padding is used to align data to a specific byte boundary or to ensure that the 
 - For large arrays or strings, consider the impact of storing length prefixes as `uint32` (4 bytes), as they slightly increase the size of the encoded data.
 - Padding ensures data alignment but may add extra bytes to the encoded PDU.
 
+
+### CITATION
+- If you use ProtocolDataUnits for your research, please cite it as below:
+    ```BibTex
+    @software{Patel_ProtocolDataUnits_2023,
+    author = {Patel, Jay and Chitre, Mandar},
+    license = {MIT},
+    month = oct,
+    title = {{ProtocolDataUnits}},
+    url = {https://github.com/patel999jay/ProtocolDataUnits},
+    version = {1.0.0},
+    year = {2023}
+    }
+    ```
 
 ## Contributing
 
