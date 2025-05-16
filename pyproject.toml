@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ProtocolDataUnits"
+version = "1.0.0"
+description = "A Python toolset for encoding and decoding Protocol Data Units (PDUs)"
+authors = [
+    { name = "Jay Patel", email = "patel.jay@dal.ca" },
+    { name = "Mandar Chitre", email = ""}
+]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["pdu", "binary", "protocol", "serialization", "modem", "communication"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+dependencies = [
+    "loguru"
+]
+
+[project.scripts]
+pdu-demo = "scripts.demo:main"
+
+[tool.setuptools]
+packages = ["ProtocolDataUnits"]
+include-package-data = true
