@@ -13,6 +13,22 @@ You can install ProtocolDataUnits using pip:
 ```
 pip install . # pip install ProtocolDataUnits
 ```
+## 🔧 Command-Line Interface (CLI) Usage
+
+After installation, you can quickly test the functionality using the built-in demo CLI tool:
+
+```bash
+pdu-demo
+```
+This runs a collection of predefined PDU encoding/decoding examples showcasing:
+	•	Basic field types (e.g., uint8, float, double)
+	•	Fixed-length and length-prefixed strings
+	•	Variable-length arrays
+	•	Nested PDUs and pdu_fragment
+	•	JSON serialization and deserialization
+	•	Compression and decompression support
+
+This is a great way to validate the installation and explore the library’s features interactively.
 
 ## Features
 
