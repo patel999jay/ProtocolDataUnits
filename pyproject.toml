@@ -8,15 +8,14 @@ version = "1.0.0"
 description = "A Python toolset for encoding and decoding Protocol Data Units (PDUs)"
 authors = [
     { name = "Jay Patel", email = "patel.jay@dal.ca" },
-    { name = "Mandar Chitre", email = ""}
+    { name = "Mandar Chitre"}
 ]
-license = { text = "MIT" }
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.8"
 keywords = ["pdu", "binary", "protocol", "serialization", "modem", "communication"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent"
 ]
 dependencies = [
