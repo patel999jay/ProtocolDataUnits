@@ -2,7 +2,6 @@
 [![PyPI version](https://img.shields.io/pypi/v/ProtocolDataUnits.svg)](https://pypi.org/project/ProtocolDataUnits/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ProtocolDataUnits)](https://pypi.org/project/ProtocolDataUnits/)
 [![PyPI - License](https://img.shields.io/pypi/l/ProtocolDataUnits)](https://opensource.org/licenses/MIT)
-[![Downloads](https://static.pepy.tech/badge/protocoldataunits)](https://pepy.tech/project/protocoldataunits)
 [![Documentation](https://readthedocs.org/projects/protocoldataunits/badge/?version=latest)](https://protocoldataunits.readthedocs.io/en/latest/?badge=latest)
 [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.png?v=103)](https://github.com/ellerbrock/open-source-badges/)
 <!-- [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) -->
