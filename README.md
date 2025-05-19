@@ -1,18 +1,27 @@
 # ProtocolDataUnits
-
+[![PyPI version](https://img.shields.io/pypi/v/ProtocolDataUnits.svg)](https://pypi.org/project/ProtocolDataUnits/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ProtocolDataUnits)](https://pypi.org/project/ProtocolDataUnits/)
+[![PyPI - License](https://img.shields.io/pypi/l/ProtocolDataUnits)](https://opensource.org/licenses/MIT)
+[![Downloads](https://static.pepy.tech/badge/protocoldataunits)](https://pepy.tech/project/protocoldataunits)
 [![Documentation](https://readthedocs.org/projects/protocoldataunits/badge/?version=latest)](https://protocoldataunits.readthedocs.io/en/latest/?badge=latest)
 [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.png?v=103)](https://github.com/ellerbrock/open-source-badges/)
-[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
+<!-- [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) -->
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 
 ProtocolDataUnits is a Python toolset for encoding and decoding Protocol Data Units (PDUs). It is inspired by `ProtocolDataUnits.jl` by [Dr. Mandar Chitre](https://github.com/mchitre), [ARL](https://github.com/org-arl).
 
 ## Installation
 
-You can install ProtocolDataUnits using pip:
+You can install ProtocolDataUnits from PyPI using:
+
+```bash
+pip install ProtocolDataUnits
 ```
-pip install . # pip install ProtocolDataUnits
+If you want to install it from the local source (for development or testing), use:
+```bash
+pip install .
 ```
+
 ## 🔧 Command-Line Interface (CLI) Usage
 
 After installation, you can quickly test the functionality using the built-in demo CLI tool:

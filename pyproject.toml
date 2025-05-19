@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ProtocolDataUnits"
-version = "1.0.1"
+version = "1.0.3"
 description = "A Python toolset for encoding and decoding Protocol Data Units (PDUs)"
 authors = [
     { name = "Jay Patel", email = "patel.jay@dal.ca" },
-    { name = "Mandar Chitre" }
+    { name = "Mandar Chitre", email = "mandar@nus.edu.sg"}
 ]
 license = "MIT" 
 readme = "README.md"
